@@ -99,14 +99,17 @@ def build_libs(cl_args):
         elif system == 'Windows':
             preset = ''
             auto_vs = True
+        elif system.startswith('CYGWIN') or system.startswith('MSYS'):
+            preset = ''
         else:
             raise NotImplementedError('Unsupported OS: {}'.format(system))
         if preset:
             print("Auto-selecting preset: {}".format(preset))
             args.generator, args.params = presets[preset]
         else:
-            print("Preset is no selected, continuing with empty generator and params...")
-            args.generator, args.params = '', ''
+            if not args.generator:
+                print("Preset is no selected, continuing with empty generator and params...")
+                args.generator, args.params = '', ''
 
     # if not args.generator:
     #     print("Generator must be specified")
@@ -134,8 +137,8 @@ def build_libs(cl_args):
     if args.findcairo:
         args.params += ' -DUSE_SYSTEM_PIXMAN=TRUE'
 
-    if not args.withStatic:
-        args.params += ' -DNO_STATIC=TRUE'
+    if args.withStatic:
+        args.params += ' -DWITH_STATIC=TRUE'
 
     if args.preset and args.preset.find('universal') != -1:
         args.params += ' -DUNIVERSAL_BUILD=TRUE'
