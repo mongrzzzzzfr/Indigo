@@ -41,6 +41,8 @@ def build_libs(cl_args):
         "win64-2013": ("Visual Studio 12 Win64", ""),
         "win64-2015": ("Visual Studio 14 Win64", ""),
         "win32-mingw": ("MinGW Makefiles", ""),
+        "win64-mingw": ("MinGW Makefiles", ""),
+        "win64-mingw64": ("MSYS Makefiles", ""),
         "linux32": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
         "linux32-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
         "linux64": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
@@ -79,6 +81,7 @@ def build_libs(cl_args):
         print("Unexpected arguments: %s" % (str(left_args)))
         exit()
 
+    auto_vs = False
     if args.preset:
         args.generator, args.params = presets[args.preset]
     else:
@@ -168,7 +171,7 @@ def build_libs(cl_args):
         if ext == ".zip":
             os.remove(os.path.join(full_build_dir, f))
 
-    if args.generator.find("Unix Makefiles") != -1:
+    if args.generator in ("Unix Makefiles", "MSYS Makefiles", "MinGW Makefiles"):
         make_args = ''
         if args.buildVerbose:
             make_args += ' VERBOSE=1'
@@ -176,8 +179,9 @@ def build_libs(cl_args):
         if args.mtbuild:
             make_args += ' -j{} '.format(get_cpu_count())
 
-        check_call("make package %s" % (make_args), shell=True)
-        check_call("make install", shell=True)
+        make_command = 'mingw32-make' if args.generator in ('MSYS Makefiles', 'MinGW Makefiles') else 'make'
+        check_call("%s package %s" % (make_command, make_args), shell=True)
+        check_call("%s install" % (make_command), shell=True)
     elif args.generator.find("Xcode") != -1:
         check_call("cmake --build . --target package --config %s" % (args.config), shell=True)
         check_call("cmake --build . --target install --config %s" % (args.config), shell=True)
@@ -187,9 +191,6 @@ def build_libs(cl_args):
             vsenv = dict(os.environ, CL='/MP')
         check_call("cmake --build . --target PACKAGE --config %s" % (args.config), env=vsenv, shell=True)
         check_call("cmake --build . --target INSTALL --config %s" % (args.config), shell=True)
-    elif args.generator.find("MinGW Makefiles") != -1:
-        check_call("mingw32-make package", shell=True)
-        check_call("mingw32-make install", shell=True)
     else:
         print("Do not know how to run package and install target")
     check_call("ctest -V --timeout 60 -C %s ." % (args.config), shell=True)

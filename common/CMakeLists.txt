@@ -12,7 +12,7 @@ file (GLOB BaseC_headers base_c/*.h*)
 
 # Collect file list for BaseCpp
 file (GLOB BaseCpp_src base_cpp/*.c*)
-if (MSVC OR MINGW)
+if (MSVC OR MINGW OR CYGWIN OR MSYS)
     file (GLOB BaseCpp_src_excl base_cpp/*_posix.c*)
 else()
     file (GLOB BaseCpp_src_excl base_cpp/*_win.c* base_cpp/*_win32.c*)

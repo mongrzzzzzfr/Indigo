@@ -18,9 +18,9 @@ class IndigoRenderer(object):
     def __init__(self, indigo):
         self.indigo = indigo
 
-        if os.name == 'posix' and not platform.mac_ver()[0] and not platform.system().startswith("CYGWIN"):
+        if os.name == 'posix' and not platform.mac_ver()[0] and not platform.system().startswith("CYGWIN") and not platform.system().startswith("MSYS"):
             self._lib = CDLL(indigo.dllpath + "/libindigo-renderer.so")
-        elif os.name == 'nt' or platform.system().startswith("CYGWIN"):
+        elif os.name == 'nt' or platform.system().startswith("CYGWIN") or platform.system().startswith("MSYS"):
             self._lib = CDLL(indigo.dllpath + "\indigo-renderer.dll")
         elif platform.mac_ver()[0]:
             self._lib = CDLL(indigo.dllpath + "/libindigo-renderer.dylib")

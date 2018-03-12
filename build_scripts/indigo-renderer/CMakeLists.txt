@@ -18,6 +18,9 @@ get_directory_property(PNG_INCLUDE_DIR DIRECTORY ../../third_party/libpng-src DE
 get_directory_property(PNG_LIBRARIES DIRECTORY ../../third_party/libpng-src DEFINITION PNG_LIBRARIES)
 get_directory_property(PNG_FOUND DIRECTORY ../../third_party/libpng-src DEFINITION PNG_FOUND)
 
+add_subdirectory(../../third_party/freetype "${CMAKE_CURRENT_BINARY_DIR}/freetype")
+SET(FREETYPE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/freetype/include)
+
 add_subdirectory(../../third_party/cairo-src/pixman "${CMAKE_CURRENT_BINARY_DIR}/pixman")
 get_directory_property(Pixman_headers_dir DIRECTORY ../../third_party/cairo-src/pixman DEFINITION Pixman_headers_dir)
 
