@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(Cairo C)
-MESSAGE(STATUS "UNIX ${UNIX} WIN32 ${WIN32} MSYS ${MSYS}")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../../common/cmake/)
 if (USE_SYSTEM_CAIRO)
     find_package(CAIRO)
@@ -157,7 +156,6 @@ if (NOT CAIRO_FOUND)
 
         add_definitions(-DCAIRO_HAS_FT_FONT)
         # add_definitions(-DCAIRO_HAS_FC_FONT)
-        message(STATUS ${FREETYPE_INCLUDE_DIRS})
         include_directories(${FREETYPE_INCLUDE_DIRS})
     else()
         list(REMOVE_ITEM CAIRO_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/cairo-ft-font.c)

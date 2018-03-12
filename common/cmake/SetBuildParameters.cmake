@@ -1,6 +1,6 @@
 set(UNIVERSAL_BUILD FALSE CACHE BOOL "Indigo C++11 universal build without dependency on libstdc++")
 
-if(NOT MSVC AND NOT BINGO)
+if(NOT MSVC AND NOT BINGO AND NOT CYGWIN AND NOT MSYS AND NOT MINGW)
     set(VISIBILITY_HIDDEN YES)
 endif()
 
@@ -75,6 +75,10 @@ if(UNIX OR APPLE)
             set(CMAKE_INSTALL_RPATH "\$ORIGIN")
     endif()
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
+
+if(CYGWIN)
+    add_definitions(-D_GNU_SOURCE)
 endif()
 
 if(VISIBILITY_HIDDEN)
