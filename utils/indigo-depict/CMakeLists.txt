@@ -10,13 +10,6 @@ include_directories(${IndigoRenderer_SOURCE_DIR} ${Indigo_SOURCE_DIR} ${Indigo_S
 
 
 add_executable(indigo-depict main.c)
-if(APPLE)
-	INCLUDE(GetSystemVersion)
-	INCLUDE(MacFrameworks)
-	FIND_FRAMEWORK(ApplicationServices)
-	target_link_libraries(indigo-depict ${FRAMEWORK_ApplicationServices})
-	SET_TARGET_PROPERTIES(indigo-depict PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Xlinker -framework -Xlinker ApplicationServices")
-endif()
 target_link_libraries(indigo-depict indigo-renderer indigo cairo png pixman)
 if (UNIX)
     set_target_properties(indigo-depict PROPERTIES LINK_FLAGS "-pthread")
