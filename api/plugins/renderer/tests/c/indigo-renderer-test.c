@@ -20,9 +20,9 @@ void testHDC ()
    int buffer_object;
    char *raw_ptr;
    int size;
-#ifdef WIN32
-   HDC hdc, hdc2;
-#endif
+// #ifdef WIN32
+//    HDC hdc, hdc2;
+// #endif
    int hdc_buffer_object;
    int molecule;
 
@@ -38,14 +38,14 @@ void testHDC ()
    //<Copy the raw_ptr data anywhere>
    indigoFree(buffer_object);
 
-#ifdef WIN32
-   hdc = GetWindowDC(NULL);
-   hdc2 = CreateCompatibleDC(hdc);
+// #ifdef WIN32
+//    hdc = GetWindowDC(NULL);
+//    hdc2 = CreateCompatibleDC(hdc);
 
-   hdc_buffer_object = indigoRenderWriteHDC(hdc2, 0);
-   indigoRender(molecule, hdc_buffer_object);
-   indigoFree(hdc_buffer_object);
-#endif
+//    hdc_buffer_object = indigoRenderWriteHDC(hdc2, 0);
+//    indigoRender(molecule, hdc_buffer_object);
+//    indigoFree(hdc_buffer_object);
+// #endif
 
    indigoFree(molecule);
 

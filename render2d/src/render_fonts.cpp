@@ -12,18 +12,10 @@
 * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 ***************************************************************************/
 
+#include <cairo-ft.h>
 #include "math/algebra.h"
 #include "base_cpp/array.h"
-#include "base_cpp/obj_array.h"
-#include "base_cpp/output.h"
-#include "molecule/molecule.h"
-#include "reaction/reaction.h"
 #include "render_context.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#include <cairo-win32.h>
-#endif 
 
 using namespace indigo;
 
