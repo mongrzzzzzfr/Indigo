@@ -44,7 +44,9 @@ def build_libs(cl_args):
         "win64-2017": ("Visual Studio 15 Win64", ""),
         "win64-2019": ("Visual Studio 16 2019", ""),
         "win32-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x86"),
+        "win32-wingw-ninja": ("Ninja", "-DSUBSYSTEM_NAME=x86"),
         "win64-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x64"),
+        "win64-mingw-ninja": ("Ninja", "-DSUBSYSTEM_NAME=x64"),
         "linux32": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
         "linux32-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
         "linux64": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
@@ -172,7 +174,7 @@ def build_libs(cl_args):
         if ext == ".zip":
             os.remove(os.path.join(full_build_dir, f))
 
-    if args.generator in {"Unix Makefiles", 'MinGW Makefiles'}:
+    if args.generator in {"Unix Makefiles", 'MinGW Makefiles', 'MSYS Makefiles'}:
         make_args = ''
         if args.buildVerbose:
             make_args += ' VERBOSE=1'
@@ -183,7 +185,7 @@ def build_libs(cl_args):
         make_command = 'mingw32-make' if args.generator == 'MinGW Makefiles' else 'make'
         check_call("%s package %s" % (make_command, make_args), shell=True)
         check_call("%s install" % make_command, shell=True)
-    elif args.generator == "Xcode":
+    elif args.generator in {"Xcode", 'Ninja'}:
         check_call("cmake --build . --target package --config %s" % args.config, shell=True)
         check_call("cmake --build . --target install --config %s" % args.config, shell=True)
     elif args.generator.startswith("Visual Studio") or auto_vs:

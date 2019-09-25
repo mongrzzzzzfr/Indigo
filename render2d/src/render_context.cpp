@@ -29,7 +29,9 @@ IMPL_ERROR(RenderContext, "render context");
 
 #ifdef _WIN32
 
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #include "cairo-win32.h"
 

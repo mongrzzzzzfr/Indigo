@@ -168,6 +168,9 @@ if (NOT CAIRO_FOUND)
     if(MSVC AND NOT DEFINED $ENV{VERBOSE})
         add_definitions(/wd4244 /wd4146 /wd4267)
     endif()
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT DEFINED $ENV{VERBOSE})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast")
+    endif()
 
     # To remove GLIBC_2.11 dependency
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0")
