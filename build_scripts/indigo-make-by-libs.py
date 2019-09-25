@@ -142,6 +142,7 @@ if __name__ == '__main__':
 
     # Find indigo version
     version = getIndigoVersion()
+    print("Indigo version is {}".format(version))
     with cwd(os.path.join(os.path.split(__file__)[0], '..', 'dist')):
 
         if need_join_archieves:
