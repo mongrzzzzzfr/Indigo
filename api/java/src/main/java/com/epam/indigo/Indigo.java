@@ -1,15 +1,19 @@
 /****************************************************************************
- * Copyright (C) 2009-2016 EPAM Systems
- *
+ * Copyright (C) from 2009 to Present EPAM Systems.
+ * 
  * This file is part of Indigo toolkit.
- *
- * This file may be distributed and/or modified under the terms of the
- * GNU General Public License version 3 as published by the Free Software
- * Foundation and appearing in the file LICENSE.GPL included in the
- * packaging of this file.
- *
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ***************************************************************************/
 
 package com.epam.indigo;
@@ -592,6 +596,15 @@ public class Indigo {
     public IndigoObject loadReactionSmartsFromFile(String path) {
         setSessionID();
         return new IndigoObject(this, checkResult(this, _lib.indigoLoadReactionSmartsFromFile(path)));
+    }
+
+    public String checkStructure(String str) {
+        return checkStructure(str, "");
+    }
+
+    public String checkStructure(String str, String params) {
+        setSessionID();
+        return checkResultString(this, _lib.indigoCheckStructure(str, params));
     }
 
     public IndigoObject loadStructure(String str) {

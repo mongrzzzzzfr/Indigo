@@ -12,7 +12,7 @@ else()
 endif()
 
 set_property(TARGET inchi PROPERTY FOLDER "third_party")
-if (NOT NO_STATIC)
+if (WITH_STATIC)
     pack_static(inchi)
 endif()
 

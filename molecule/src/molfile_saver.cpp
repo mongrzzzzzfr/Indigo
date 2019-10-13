@@ -1,15 +1,19 @@
 /****************************************************************************
- * Copyright (C) 2009-2015 EPAM Systems
+ * Copyright (C) from 2009 to Present EPAM Systems.
  * 
  * This file is part of Indigo toolkit.
  * 
- * This file may be distributed and/or modified under the terms of the
- * GNU General Public License version 3 as published by the Free Software
- * Foundation and appearing in the file LICENSE.GPL included in the
- * packaging of this file.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ***************************************************************************/
 
 #include "molecule/molfile_saver.h"
@@ -44,6 +48,7 @@ TL_CP_GET(_bond_mapping)
 {
    mode = MODE_AUTO;
    no_chiral = false;
+   chiral_flag = -1;
    skip_date = false;
    add_stereo_desc = false;
    add_implicit_h = true;
@@ -273,6 +278,8 @@ void MolfileSaver::_writeCtabHeader2000 (Output &output, BaseMolecule &mol)
 
    if (!no_chiral && mol.isChiral())
       chiral = 1;
+   if (chiral_flag != -1)
+      chiral = chiral_flag;
 
    output.printfCR("%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d V2000",
       mol.vertexCount(), mol.edgeCount(), 0, 0, chiral, 0, 0, 0, 0, 0, 999);

@@ -1,15 +1,19 @@
 /****************************************************************************
- * Copyright (C) 2009-2015 EPAM Systems
- *
+ * Copyright (C) from 2009 to Present EPAM Systems.
+ * 
  * This file is part of Indigo toolkit.
- *
- * This file may be distributed and/or modified under the terms of the
- * GNU General Public License version 3 as published by the Free Software
- * Foundation and appearing in the file LICENSE.GPL included in the
- * packaging of this file.
- *
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ***************************************************************************/
 
 #ifndef __indigo__
@@ -204,6 +208,8 @@ CEXPORT const char * indigoCdxml (int object);
 // the output must be a file or a buffer, but not a string
 // (because MDLCT data usually contains zeroes)
 CEXPORT int indigoSaveMDLCT (int item, int output);
+
+CEXPORT const char * indigoJson (int object);
 
 /*
 Converts a chemical name into a corresponding structure
@@ -406,6 +412,12 @@ CEXPORT int indigoCheckQuery (int item);
 
 // Returns one if structure contains RGroup features (RSites, RGroups or attachment points
 CEXPORT int indigoCheckRGroups (int item);
+
+// Returns check result for Indigo object for requested properties
+CEXPORT const char * indigoCheck (int item, const char *props);
+
+// Returns check result for structure against requested properties
+CEXPORT const char * indigoCheckStructure (const char *structure, const char *props);
 
 // Applicable to atoms, query atoms, and molecules. Can fail
 // (return zero) on query atoms where the number of hydrogens

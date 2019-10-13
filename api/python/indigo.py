@@ -1,20 +1,24 @@
 #
 #
-# Copyright (C) 2009-2016 EPAM Systems
-#
+# Copyright (C) from 2009 to Present EPAM Systems.
+# 
 # This file is part of Indigo toolkit.
-#
-# This file may be distributed and/or modified under the terms of the
-# GNU General Public License version 3 as published by the Free Software
-# Foundation and appearing in the file LICENSE.GPL included in the
-# packaging of this file.
-#
-# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import sys
 import os
 import platform
+import sys
 from array import array
 from ctypes import c_int, c_char_p, c_float, POINTER, pointer, CDLL, RTLD_GLOBAL, c_ulonglong, c_byte, c_double
 
@@ -117,6 +121,12 @@ class IndigoObject(object):
         self.dispatcher._setSessionId()
         return self.dispatcher.IndigoObject(self.dispatcher, self.dispatcher._checkResult(Indigo._lib.indigoClone(self.id)))
 
+    def check(self, props=''):
+        if props is None:
+            props = ''
+        self.dispatcher._setSessionId()
+        return self.dispatcher._checkResultString(Indigo._lib.indigoCheck(self.id, props.encode(ENCODE_ENCODING)))
+
     def close(self):
         self.dispatcher._setSessionId()
         return self.dispatcher._checkResult(Indigo._lib.indigoClose(self.id))
@@ -156,6 +166,10 @@ class IndigoObject(object):
     def cdxml(self):
         self.dispatcher._setSessionId()
         return self.dispatcher._checkResultString(Indigo._lib.indigoCdxml(self.id))
+
+    def json(self):
+        self.dispatcher._setSessionId()
+        return self.dispatcher._checkResultString(Indigo._lib.indigoJson(self.id))
 
     def saveMDLCT(self, output):
         self.dispatcher._setSessionId()
@@ -1655,6 +1669,10 @@ class Indigo(object):
         Indigo._lib.indigoDbgBreakpoint.argtypes = None
         Indigo._lib.indigoClone.restype = c_int
         Indigo._lib.indigoClone.argtypes = [c_int]
+        Indigo._lib.indigoCheck.restype = c_char_p
+        Indigo._lib.indigoCheck.argtypes = [c_int, c_char_p]
+        Indigo._lib.indigoCheckStructure.restype = c_char_p
+        Indigo._lib.indigoCheckStructure.argtypes = [c_char_p, c_char_p]
         Indigo._lib.indigoClose.restype = c_int
         Indigo._lib.indigoClose.argtypes = [c_int]
         Indigo._lib.indigoNext.restype = c_int
@@ -1677,6 +1695,8 @@ class Indigo(object):
         Indigo._lib.indigoSaveCdxmlToFile.argtypes = [c_int, c_char_p]
         Indigo._lib.indigoCdxml.restype = c_char_p
         Indigo._lib.indigoCdxml.argtypes = [c_int]
+        Indigo._lib.indigoJson.restype = c_char_p
+        Indigo._lib.indigoJson.argtypes = [c_int]
         Indigo._lib.indigoSaveMDLCT.restype = c_int
         Indigo._lib.indigoSaveMDLCT.argtypes = [c_int, c_int]
         Indigo._lib.indigoAddReactant.restype = c_int
@@ -2443,14 +2463,14 @@ class Indigo(object):
         self._setSessionId()
         return self.IndigoObject(self, self._checkResult(Indigo._lib.indigoLoadReactionSmartsFromFile(filename.encode(ENCODE_ENCODING))))
 
-    def loadStructure(self, structureStr, parameter = None):
+    def loadStructure(self, structureStr, parameter=None):
         self._setSessionId()
-        parameter = '' if parameter is None else parameter 
+        parameter = '' if parameter is None else parameter
         return self.IndigoObject(self, 
                                  self._checkResult(Indigo._lib.indigoLoadStructureFromString(structureStr.encode(ENCODE_ENCODING),
-                                                                                             parameter)))
+                                                                                             parameter.encode(ENCODE_ENCODING))))
         
-    def loadStructureFromBuffer(self, structureData, parameter = None):
+    def loadStructureFromBuffer(self, structureData, parameter=None):
         if sys.version_info[0] < 3:
             buf = map(ord, structureData)
         else:
@@ -2459,12 +2479,20 @@ class Indigo(object):
         for i in range(len(buf)):
             values[i] = buf[i]
         self._setSessionId()
-        return self.IndigoObject(self, self._checkResult(Indigo._lib.indigoLoadStructureFromBuffer(values, len(buf), parameter)))
+        parameter = '' if parameter is None else parameter
+        return self.IndigoObject(self, self._checkResult(Indigo._lib.indigoLoadStructureFromBuffer(values, len(buf), parameter.encode(ENCODE_ENCODING))))
     
-    def loadStructureFromFile(self, filename, parameter = None):
+    def loadStructureFromFile(self, filename, parameter=None):
         self._setSessionId()
+        parameter = '' if parameter is None else parameter
         return self.IndigoObject(self, self._checkResult(Indigo._lib.indigoLoadStructureFromFile(filename.encode(ENCODE_ENCODING), 
-                                                                                                 parameter)))
+                                                                                                 parameter.encode(ENCODE_ENCODING))))
+
+    def checkStructure(self, structure, props=''):
+        if props is None:
+            props = ''
+        self._setSessionId()
+        return self._checkResultString(Indigo._lib.indigoCheckStructure(structure.encode(ENCODE_ENCODING), props.encode(ENCODE_ENCODING)))
 
     def loadFingerprintFromBuffer(self, buffer):
         """ Creates a fingerprint from the supplied binary data
@@ -2683,7 +2711,7 @@ class Indigo(object):
 
     def iterateTautomers(self, molecule, params):
         self._setSessionId()
-        return self.IndigoObject(self, self._checkResult(Indigo._lib.indigoIterateTautomers(molecule.id, params)), molecule)
+        return self.IndigoObject(self, self._checkResult(Indigo._lib.indigoIterateTautomers(molecule.id, params.encode(ENCODE_ENCODING))), molecule)
 
     def nameToStructure(self, name, params=None):
         """

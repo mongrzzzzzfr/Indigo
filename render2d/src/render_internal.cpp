@@ -1,15 +1,19 @@
 /****************************************************************************
- * Copyright (C) 2009-2017 EPAM Systems
- *
+ * Copyright (C) from 2009 to Present EPAM Systems.
+ * 
  * This file is part of Indigo toolkit.
- *
- * This file may be distributed and/or modified under the terms of the
- * GNU General Public License version 3 as published by the Free Software
- * Foundation and appearing in the file LICENSE.GPL included in the
- * packaging of this file.
- *
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ***************************************************************************/
 
 #include "base_cpp/tree.h"
@@ -269,6 +273,8 @@ void MoleculeRenderInternal::setQueryReactionComponentProperties (const Array<in
 
 void MoleculeRenderInternal::render ()
 {
+   _precalcScale();
+
    _initCoordinates();
 
    _initBondData();
@@ -3909,4 +3915,77 @@ void MoleculeRenderInternal::_bondTriple (BondDescr& bd, const BondEnd& be1, con
    _cw.drawLine(vl1, vl2);
 
    bd.extP = bd.extN = _settings.bondSpace * 2 + _settings.bondLineWidth / 2;
+}
+
+void MoleculeRenderInternal::_precalcScale()
+{
+    // Check structure for long atom labels (pseudoatoms, SMARTS) and change scale to fix
+    // the issue with labels overlapping each other
+    long long int max_output_length = 4;
+    BaseMolecule& bm = *_mol;
+    Array<long long int> output_lengths;
+    int max_index = -1;
+    output_lengths.resize(bm.vertexCount());
+    for (int i = _mol->vertexBegin(); i < _mol->vertexEnd(); i = _mol->vertexNext(i)) {
+        long long int output_length = 0;
+        Array<int> iarr;
+        Array<char> carr;
+        if (bm.isPseudoAtom(i)) {
+            carr.readString(bm.getPseudoAtom(i), true);
+            output_length = carr.size();
+        } else if (bm.isTemplateAtom(i)) {
+            carr.readString(bm.getTemplateAtom(i), true);
+            output_length = carr.size();
+        } else if (bm.isRSite(i)) {
+            output_length = 0;
+            QS_DEF(Array<int>, rg);
+            bm.getAllowedRGroups(i, rg);
+            if (rg.size() == 0) {
+                output_length += 1;
+            } else {
+                for (int j = 0; j < rg.size(); ++j) {
+                    if (j > 0) {
+                        output_length += 1;
+                    }
+                    output_length += 2;
+                }
+            }
+        } else if (_mol->isQueryMolecule()) {
+            QueryMolecule &qmol = _mol->asQueryMolecule();
+            int queryLabel = QueryMolecule::parseQueryAtom(qmol, i, iarr);
+            if (queryLabel < 0) {
+                bm.getAtomDescription(i, carr);
+                output_length = carr.size();
+            } else if (!QueryMolecule::queryAtomIsRegular(qmol, i)) {
+                output_length = 1;
+                for (int j = 0; j < iarr.size(); ++j) {
+                    if (j > 0) {
+                        output_length += 1;
+                    }
+                    output_length += strlen(Element::toString(iarr[j]));
+                }
+                output_length += 1;
+            } else {
+                output_length = strlen(Element::toString(bm.getAtomNumber(i)));
+            }
+        } else {
+            output_length = strlen(Element::toString(bm.getAtomNumber(i)));
+        }
+        output_lengths[i] = output_length;
+        if (max_output_length < output_lengths[i]) {
+            max_output_length = output_lengths[i];
+            max_index = i;
+        }
+    }
+    float scale_modificator = 1.0;
+    if (max_index >= 0) {
+        const Vertex& max_length_vertex = bm.getVertex(max_index);
+        for (auto nei = max_length_vertex.neiBegin(); nei != max_length_vertex.neiEnd(); nei = max_length_vertex.neiNext(nei)) {
+            if (max_output_length - output_lengths[max_length_vertex.neiVertex(nei)] > 10) {
+                scale_modificator = 2.0;
+                break;
+            }
+        }
+    }
+    _scale = __max(_scale, float(max_output_length) / ((float)10.0 * scale_modificator));
 }

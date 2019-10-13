@@ -1,15 +1,19 @@
 /****************************************************************************
- * Copyright (C) 2009-2015 EPAM Systems
+ * Copyright (C) from 2009 to Present EPAM Systems.
  * 
  * This file is part of Indigo toolkit.
  * 
- * This file may be distributed and/or modified under the terms of the
- * GNU General Public License version 3 as published by the Free Software
- * Foundation and appearing in the file LICENSE.GPL included in the
- * packaging of this file.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ***************************************************************************/
 
 #include "locale.h"
@@ -42,6 +46,7 @@ void Indigo::init ()
    stereochemistry_options.reset();
    ignore_noncritical_query_features = false;
    ignore_no_chiral_flag = false;
+   treat_stereo_as = 0;
    treat_x_as_pseudoatom = false;
    skip_3d_chirality = false;
    deconvolution_aromatization = true;
@@ -49,6 +54,7 @@ void Indigo::init ()
    deco_ignore_errors = true;
    molfile_saving_mode = 0;
    molfile_saving_no_chiral = false;
+   molfile_saving_chiral_flag = -1;
    filename_encoding = ENCODING_ASCII;
    fp_params.any_qwords = 15;
    fp_params.sim_qwords = 8;
@@ -129,6 +135,7 @@ void Indigo::initMolfileSaver (MolfileSaver &saver)
    saver.no_chiral = molfile_saving_no_chiral;
    saver.add_stereo_desc = molfile_saving_add_stereo_desc;
    saver.add_implicit_h = molfile_saving_add_implicit_h;
+   saver.chiral_flag = molfile_saving_chiral_flag;
 }
 
 void Indigo::initRxnfileSaver (RxnfileSaver &saver)

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.8)
 
 project(IndigoAll C CXX)
 
@@ -25,13 +25,12 @@ FOREACH(lib ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS})
     INSTALL(FILES ${lib} DESTINATION "shared/${SYSTEM_NAME}/${SUBSYSTEM_NAME}" COMPONENT shared)
 ENDFOREACH()
 
-if (NOT NO_STATIC)
+if (WITH_STATIC)
     set(COMPONENTS static shared)
 else()
     set(COMPONENTS shared)
 endif()
 
-# Uncomment it in CMake 2.8.8:  http://www.gccxml.org/Bug/view.php?id=12129
 SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
 
 SET(CPACK_COMPONENTS_ALL ${COMPONENTS})
@@ -40,7 +39,7 @@ SET(CPACK_GENERATOR "ZIP")
 SET(CPACK_PACKAGE_FILE_NAME "indigo-libs-${INDIGO_VERSION}-${PACKAGE_SUFFIX}")
 
 foreach(comp ${COMPONENTS})
-    INSTALL(FILES ${Indigo_SOURCE_DIR}/LICENSE.GPL DESTINATION . COMPONENT ${comp})
+    INSTALL(FILES ${Indigo_SOURCE_DIR}/LICENSE DESTINATION . COMPONENT ${comp})
     INSTALL(FILES ${Indigo_SOURCE_DIR}/indigo.h DESTINATION . COMPONENT ${comp})
     INSTALL(FILES ${Indigo_SOURCE_DIR}/plugins/renderer/indigo-renderer.h DESTINATION . COMPONENT ${comp})
     INSTALL(FILES ${Indigo_SOURCE_DIR}/plugins/inchi/indigo-inchi.h DESTINATION . COMPONENT ${comp})

@@ -61,6 +61,7 @@ namespace com.epam.indigo
         int indigoSaveCml(int molecule, int output);
         int indigoSaveCmlToFile(int molecule, string filename);
         sbyte* indigoCml(int molecule);
+        sbyte* indigoJson (int molecule);
         int indigoSaveCdxml(int molecule, int output);
         int indigoSaveCdxmlToFile(int molecule, string filename);
         sbyte* indigoCdxml(int molecule);
@@ -352,6 +353,9 @@ namespace com.epam.indigo
         int indigoCheckChirality(int handle);
         int indigoCheck3DStereo(int handle);
         int indigoCheckStereo(int handle);
+
+        sbyte* indigoCheck(int item, string type);
+        sbyte* indigoCheckStructure (string structure, string type);
 
         int indigoFingerprint(int item, string type);
         int indigoLoadFingerprintFromBuffer(byte[] buffer, int size);

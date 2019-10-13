@@ -103,6 +103,12 @@ namespace com.epam.indigo
             return dispatcher.checkResult(_indigo_lib.indigoCml(self));
         }
 
+        public string json()
+        {
+            dispatcher.setSessionID();
+            return dispatcher.checkResult(_indigo_lib.indigoJson(self));
+        }
+
         public void saveCml(string filename)
         {
             dispatcher.setSessionID();
@@ -1623,6 +1629,19 @@ namespace com.epam.indigo
         {
             dispatcher.setSessionID();
             return dispatcher.checkResult(_indigo_lib.indigoCheckStereo(self));
+        }
+
+        public string check()
+        {
+            return check("");
+        }
+
+        public string check(string type)
+        {
+            if (type == null)
+                type = "";
+            dispatcher.setSessionID();
+            return dispatcher.checkResult(_indigo_lib.indigoCheck(self, type));
         }
 
         public IndigoObject fingerprint(string type)

@@ -23,7 +23,6 @@ else:
 
 
 def get_cpu_count():
-    cpu_count = 1
     if os.name == 'java':
         from java.lang import Runtime
         runtime = Runtime.getRuntime()
@@ -39,11 +38,13 @@ def build_libs(cl_args):
         "win32-2013": ("Visual Studio 12", ""),
         "win32-2015": ("Visual Studio 14", ""),
         "win32-2017": ("Visual Studio 15", ""),
+        "win32-2019": ("Visual Studio 16 2019", "-A Win32"),
         "win64-2013": ("Visual Studio 12 Win64", ""),
         "win64-2015": ("Visual Studio 14 Win64", ""),
         "win64-2017": ("Visual Studio 15 Win64", ""),
-        "win32-mingw": ("MinGW Makefiles", ""),
-        "win64-mingw": ("MinGW Makefiles", ""),
+        "win64-2019": ("Visual Studio 16 2019", ""),
+        "win32-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x86"),
+        "win64-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x64"),
         "win64-mingw64": ("MSYS Makefiles", ""),
         "linux32": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
         "linux32-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
@@ -56,6 +57,7 @@ def build_libs(cl_args):
         "mac10.11": ("Xcode", "-DSUBSYSTEM_NAME=10.11"),
         "mac10.12": ("Xcode", "-DSUBSYSTEM_NAME=10.12"),
         "mac10.13": ("Xcode", "-DSUBSYSTEM_NAME=10.13"),
+        "mac10.14": ("Xcode", "-DSUBSYSTEM_NAME=10.14"),
         "mac-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=10.7"),
     }
 
@@ -113,10 +115,6 @@ def build_libs(cl_args):
                 print("Preset is no selected, continuing with empty generator and params...")
                 args.generator, args.params = '', ''
 
-    # if not args.generator:
-    #     print("Generator must be specified")
-    #     exit()
-
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     root = os.path.join(cur_dir, "..")
     project_dir = os.path.join(cur_dir, "indigo-all")
@@ -163,6 +161,8 @@ def build_libs(cl_args):
 
     environment_prefix = ''
     if args.preset and (args.preset.find('linux') != -1 and args.preset.find('universal') != -1):
+        if args.preset.find('32') != -1:
+            os.environ['LD_FLAGS'] = '{} {}'.format(os.environ.get('LD_FLAGS', ''), '-m32')
         environment_prefix = 'CC=gcc CXX=g++'
     command = "%s cmake %s %s %s" % (environment_prefix, '-G \"%s\"' % args.generator if args.generator else '', args.params, project_dir)
     print(command)
@@ -194,12 +194,11 @@ def build_libs(cl_args):
         vsenv = os.environ
         if args.mtbuild:
             vsenv = dict(os.environ, CL='/MP')
-        check_call("cmake --build . --target PACKAGE --config %s" % (args.config), env=vsenv, shell=True)
-        check_call("cmake --build . --target INSTALL --config %s" % (args.config), shell=True)
+        check_call("cmake --build . --target PACKAGE --config %s" % args.config, env=vsenv, shell=True)
+        check_call("cmake --build . --target INSTALL --config %s" % args.config, shell=True)
     else:
         print("Do not know how to run package and install target")
-    check_call("ctest -V --timeout 60 -C %s ." % (args.config), shell=True)
-
+    check_call("ctest -V --timeout 60 -C %s ." % args.config, shell=True)
     os.chdir(root)
     if not os.path.exists("dist"):
         os.mkdir("dist")
@@ -213,7 +212,7 @@ def build_libs(cl_args):
             shutil.copy(os.path.join(full_build_dir, f), zip_path)
             zip_path_vec.append(zip_path)
 
-    return(zip_path_vec)
+    return zip_path_vec
 
 
 if __name__ == '__main__':

@@ -1,15 +1,19 @@
 /****************************************************************************
- * Copyright (C) 2009-2015 EPAM Systems
+ * Copyright (C) from 2009 to Present EPAM Systems.
  * 
  * This file is part of Indigo toolkit.
  * 
- * This file may be distributed and/or modified under the terms of the
- * GNU General Public License version 3 as published by the Free Software
- * Foundation and appearing in the file LICENSE.GPL included in the
- * packaging of this file.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ***************************************************************************/
 
 #ifndef __molfile_loader__
@@ -51,12 +55,20 @@ public:
    bool treat_x_as_pseudoatom; // normally 'X' means 'any halogen'
    bool skip_3d_chirality; // do not compute chirality from 3D coordinates
    bool ignore_no_chiral_flag; // ignore chiral flag absence (treat stereo "as drawn")
+                               // (depricated, use treat_stereo-as instead of this option)
    bool ignore_bad_valence;   // ignore bad valence (default value is false)
 
    // When true, the "bond topology", "stereo care", "ring bond count", and "unsaturation"
    // specifications are ignored when a non-query molecule is being loaded.
    // Otherwise, an error is thrown (this is the default).
    bool ignore_noncritical_query_features;
+
+   int  treat_stereo_as;  // treat stereo as 'ucf', 'abs', 'rel', 'rac', 'any'
+                          //  = 0 ('ucf') - use chiral flag (default value)
+                          //  = ATOM_ABS ('abs')
+                          //  = ATOM_OR  ('rel')
+                          //  = ATOM_AND ('rac')
+                          //  = ATOM_ANY ('any')
 
 protected:
 

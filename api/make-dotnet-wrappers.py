@@ -1,17 +1,13 @@
-from optparse import OptionParser
 import os
-from os.path import join, abspath, dirname
 import shutil
 import subprocess
+from optparse import OptionParser
+from os.path import join, abspath, dirname
 
 from get_indigo_version import getIndigoVersion
 
+msbuildcommand = 'msbuild /t:Rebuild /p:Configuration=Release /p:Platform="Any CPU"'
 
-if os.name == 'nt':
-    msbuildcommand = 'msbuild /t:Rebuild /p:Configuration=Release'
-else:
-    # Mono
-    msbuildcommand = 'xbuild /t:Rebuild /p:Configuration=Release'
 
 parser = OptionParser(description='Indigo .NET libraries build script')
 parser.add_option('--suffix', '-s', help='archive suffix', default="")
@@ -174,7 +170,7 @@ subprocess.check_call(command, shell=True)
 
 # Zip results
 os.chdir(dist_dir)
-shutil.copy(os.path.join(api_dir, "LICENSE.GPL"), "dotnet")
+shutil.copy(os.path.join(api_dir, "LICENSE"), "dotnet")
 shutil.copy(join(indigoDotNetPath, 'bin', 'Release', 'indigo-dotnet.dll'), "dotnet")
 shutil.copy(join(indigoRendererDotNetPath, 'bin', 'Release', 'indigo-renderer-dotnet.dll'), "dotnet")
 shutil.copy(join(indigoInchiDotNetPath, 'bin', 'Release', 'indigo-inchi-dotnet.dll'), "dotnet")

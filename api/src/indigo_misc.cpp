@@ -1,15 +1,19 @@
 /****************************************************************************
- * Copyright (C) 2009-2015 EPAM Systems
- *
+ * Copyright (C) from 2009 to Present EPAM Systems.
+ * 
  * This file is part of Indigo toolkit.
- *
- * This file may be distributed and/or modified under the terms of the
- * GNU General Public License version 3 as published by the Free Software
- * Foundation and appearing in the file LICENSE.GPL included in the
- * packaging of this file.
- *
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ***************************************************************************/
 
 #include "indigo_internal.h"
@@ -35,6 +39,11 @@
 #include "molecule/molecule_standardize.h"
 #include "molecule/molecule_ionize.h"
 #include "molecule/molecule_automorphism_search.h"
+#include "molecule/structure_checker.h"
+#include "reaction/reaction_checker.h"
+
+#include "molecule/molecule_json_saver.h"
+#include "molecule/molecule_json_loader.h"
 
 #define CHECKRGB(r, g, b) \
 if (__min3(r, g, b) < 0 || __max3(r, g, b) > 1.0 + 1e-6) \
@@ -1291,3 +1300,144 @@ CEXPORT int indigoCheckStereo (int item)
    }
    INDIGO_END(-1);
 }
+
+CEXPORT const char * indigoCheck (int item, const char *props)
+{
+   INDIGO_BEGIN
+   {
+      auto &tmp = self.getThreadTmpData();
+      ArrayOutput out(tmp.string);
+
+      IndigoObject &obj = self.getObject(item);
+
+      if (IndigoBaseMolecule::is(obj))
+      {
+         StructureChecker ch(out);
+         ch.parseCheckTypes(props);
+
+         BaseMolecule &bmol = obj.getBaseMolecule();
+
+         if (bmol.isQueryMolecule())
+         {
+            QueryMolecule &qmol = bmol.asQueryMolecule();
+            ch.checkQueryMolecule(qmol);
+         }
+         else
+         {
+            Molecule &mol = bmol.asMolecule();
+            ch.checkMolecule(mol);
+         }
+      }
+      else if (IndigoBaseReaction::is(obj))
+      {
+         ReactionChecker ch(out);
+         ch.setCheckTypes(props);
+
+         BaseReaction &brxn = obj.getBaseReaction();
+         ch.checkBaseReaction(brxn);
+      }
+      else if (IndigoAtom::is(obj))
+      {
+         StructureChecker ch(out);
+         ch.parseCheckTypes(props);
+
+         IndigoAtom &ia = IndigoAtom::cast(obj);
+         QS_DEF(Array<int>, atoms);
+         atoms.clear();
+         atoms.push(ia.getIndex() + 1);
+         ch.addAtomSelection(atoms);
+
+         if (ia.mol.isQueryMolecule())
+         {
+            QueryMolecule &qmol = ia.mol.asQueryMolecule();
+            ch.checkQueryMolecule(qmol);
+         }
+         else
+         {
+            Molecule &mol = ia.mol.asMolecule();
+            ch.checkMolecule(mol);
+         }
+      }
+      else if (IndigoBond::is(obj))
+      {
+         StructureChecker ch(out);
+         ch.parseCheckTypes(props);
+
+         IndigoBond &ib = IndigoBond::cast(obj);
+         QS_DEF(Array<int>, bonds);
+         bonds.clear();
+         bonds.push(ib.getIndex() + 1);
+         ch.addBondSelection(bonds);
+
+         if (ib.mol.isQueryMolecule())
+         {
+            QueryMolecule &qmol = ib.mol.asQueryMolecule();
+            ch.checkQueryMolecule(qmol);
+         }
+         else
+         {
+            Molecule &mol = ib.mol.asMolecule();
+            ch.checkMolecule(mol);
+         }
+      }
+      out.writeChar(0);
+      return tmp.string.ptr();
+   }
+   INDIGO_END(0);
+}
+
+CEXPORT const char * indigoCheckStructure (const char *structure, const char *props)
+{
+   INDIGO_BEGIN
+   {
+      auto &tmp = self.getThreadTmpData();
+      ArrayOutput out(tmp.string);
+
+      try {
+         int item  = indigoLoadStructureFromString(structure, "");
+         if (item > 0) 
+            out.writeString(indigoCheck(item, props));
+         else
+            out.writeString("{\"LOAD\":{\"message\":\"Error at loading structure\"}}");
+      } catch (Exception& e) {
+         out.printf("{\"LOAD\":{\"message\":\"Error at loading structure. %s\"}}", e.message());
+      }
+
+      out.writeChar(0);
+      return tmp.string.ptr();
+   }
+   INDIGO_END(0);
+}
+
+CEXPORT const char * indigoJson (int item)
+{
+   INDIGO_BEGIN
+   {
+      auto &tmp = self.getThreadTmpData();
+      ArrayOutput out(tmp.string);
+
+      IndigoObject &obj = self.getObject(item);
+
+      if (IndigoBaseMolecule::is(obj))
+      {
+         MoleculeJsonSaver jn(out);
+
+         BaseMolecule &bmol = obj.getBaseMolecule();
+
+         if (bmol.isQueryMolecule())
+         {
+            QueryMolecule &qmol = bmol.asQueryMolecule();
+            jn.saveQueryMolecule(qmol);
+         }
+         else
+         {
+            Molecule &mol = bmol.asMolecule();
+            jn.saveMolecule(mol);
+         }
+      }
+      out.writeChar(0);
+      return tmp.string.ptr();
+   }
+   INDIGO_END(0);
+}
+
