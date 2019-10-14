@@ -1454,13 +1454,13 @@ class Indigo(object):
 
     # Python embeds path into .pyc code if method is marked with @staticmethod
     # This causes an error when Indigo is loaded from different places by relative path
-    def _initStatic(self, path = None):
+    def _initStatic(self, path=None):
         if not path:
             cur_file = os.path.abspath(__file__)
-            dirname = os.path.dirname(cur_file)
+            dirname = os.path.dirname(os.path.dirname(cur_file))
             if not dirname:
                 dirname = '.'
-            path = dirname + '/lib'
+            path = os.path.join(dirname, 'lib')
         if os.name == 'posix' and not platform.mac_ver()[0] and not platform.system().startswith("CYGWIN") and not platform.system().startswith("MSYS"):
             arch = platform.architecture()[0]
             path += "/Linux"
@@ -1487,7 +1487,7 @@ class Indigo(object):
             if os.path.exists(path + "/vcruntime140.dll"):
                 Indigo._crt = CDLL(path + "/vcruntime140.dll")
                 Indigo._crtp = CDLL(path + "/msvcp140.dll")
-            Indigo._lib = CDLL(path + "/indigo.dll")
+            Indigo._lib = CDLL(os.path.join(path, 'indigo.dll'))
         elif platform.mac_ver()[0]:
             path += "/Mac/"
             mac_ver = '.'.join(platform.mac_ver()[0].split('.')[:2])
