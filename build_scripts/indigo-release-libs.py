@@ -184,7 +184,7 @@ def build_libs(cl_args):
         if args.mtbuild:
             make_args += ' -j{} '.format(get_cpu_count())
 
-        make_command = 'mingw32-make' if args.generator in ('MSYS Makefiles', 'MinGW Makefiles') else 'make'
+        make_command = 'mingw32-make' if args.generator in ('MinGW Makefiles', ) else 'make'
         check_call("%s package %s" % (make_command, make_args), shell=True)
         check_call("%s install" % (make_command), shell=True)
     elif args.generator.find("Xcode") != -1:
