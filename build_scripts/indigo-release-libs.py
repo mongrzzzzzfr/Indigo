@@ -59,6 +59,7 @@ def build_libs(cl_args):
         "mac10.13": ("Xcode", "-DSUBSYSTEM_NAME=10.13"),
         "mac10.14": ("Xcode", "-DSUBSYSTEM_NAME=10.14"),
         "mac-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=10.7"),
+        "wasm32": ("Ninja", "-DSYSTEM_NAME=Wasm -DSUBSYSTEM_NAME=32"), # -DCMAKE_C_COMPILER=emcc -DCMAKE_CXX_COMPILER=em++ 
     }
 
     parser = OptionParser(description='Indigo libraries build script')
@@ -164,6 +165,8 @@ def build_libs(cl_args):
         if args.preset.find('32') != -1:
             os.environ['LD_FLAGS'] = '{} {}'.format(os.environ.get('LD_FLAGS', ''), '-m32')
         environment_prefix = 'CC=gcc CXX=g++'
+    if args.preset and args.preset.find('wasm') != -1:
+        environment_prefix = 'emcmake'
     command = "%s cmake %s %s %s" % (environment_prefix, '-G \"%s\"' % args.generator if args.generator else '', args.params, project_dir)
     print(command)
     check_call(command, shell=True)

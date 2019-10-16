@@ -66,6 +66,9 @@ typedef unsigned char byte;
       #define EXPORT_SYMBOL __declspec(dllexport)
    #elif (defined __GNUC__ || defined __APPLE__)
       #define EXPORT_SYMBOL __attribute__ ((visibility ("default")))
+   #elif defined(EMSCRIPTEN)
+      #inlcude <emscripten.h>
+   #define EXPORT_SYMBOL EMSCRIPTEN_KEEPALIVE
    #else
       #define EXPORT_SYMBOL
    #endif
