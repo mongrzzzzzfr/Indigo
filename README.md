@@ -33,7 +33,7 @@ Bindings:
 Main directory structure layout:
  * api: Indigo API sources
  * bingo: Bingo sources
- * build_scripts: CMake and python scripts for building all the sources
+ * build_scripts: CMake and Python scripts for building all the sources
  * third_party: sources for third-party libraries
  * utils: utilities sources
  * common|graph|layout|molecule|reaction|render2d: indigo-core sources
@@ -59,12 +59,8 @@ The are different cmake presets:
 
 ## Indigo build instructions ##
 
-To generate project configuration, build the source code, and create the archives for
-installation you need to execute `build_scripts/indigo-release-libs.py` and
-`build_scripts/indigo-release-utils.py`:
-
-
-### Linux (GCC 4.9+ or Clang 3.5+)
+### Build dependencies
+#### Linux (GCC 4.9+ or Clang 3.5+)
 APT-based requirements (Debian or Ubuntu):
 ```bash
 sudo apt install cmake libfreetype6-dev libfontconfig1-dev
@@ -73,39 +69,51 @@ RPM-based requirements (RedHat, CentOS, Fedora): install Developer Toolset if yo
 ```bash
 sudo yum install cmake freetype-devel fontconfig-devel
 ```
-Build libraries and utils:
-```bash
-python build_scripts/indigo-release-libs.py --preset=linux64
-python build_scripts/indigo-release-utils.py --preset=linux64
-```
-### Windows (Microsoft Visual Studio 2013+ or MinGW with GCC version 4.9+)
-```bash
-python build_scripts/indigo-release-libs.py --preset=win64-2013
-python build_scripts/indigo-release-utils.py --preset=win64-2013
-```
-### Mac OS (Clang 3.5+)
-```bash
-python build_scripts/indigo-release-libs.py --preset=mac10.14
-python build_scripts/indigo-release-utils.py --preset=mac10.14
-```
-### Other
 
-There are different cmake presets:
-* win32-2013, win64-2013: Visual Studio 2013
-* win32-2015, win64-2015: Visual Studio 2015
-* win32-2017, win64-2017: Visual Studio 2017
-* win32-2019, win64-2019: Visual Studio 2019
-* win32-mingw: MinGW
-* win64-mingw: MinGW-w64 
-* linux32, linux64: GCC or Clang on Linux with C++11 support
-* linux32-universal, linux64-universal: GCC on Linux with statically linked libstdc++ for using on older Linux systems without C++11 support
-* mac10.7, mac10.8, mac10.9, mac10.10, mac10.11, mac10.12, mac10.12, mac10.13, mac10.14, mac10.15: target Mac OS X or macOS
-* mac-universal: targeting Mac OS X 10.7 as first version with C++11 support, should work on all Mac OS X 10.7+ systems
-
-### Wrappers
-
-To generate Java, C#, or Python wrappers after build the binaries you need to execute
+### Build native Indigo libraries:
 ```bash
-python build_scripts/indigo-make-by-libs.py --type=java
+python build_scripts/indigo-release-libs.py
 ```
-Available types: java, dotnet, python
+By default build script will use CMake default settings for current platform, but you can also select a preset for 
+targeting special version of build tools. There is a `--preset` parameter for that, and here are the currently available 
+presets:
+* `win32-2013`, `win64-2013`: Visual Studio 2013
+* `win32-2015`, `win64-2015`: Visual Studio 2015
+* `win32-2017`, `win64-2017`: Visual Studio 2017
+* `win32-2019`, `win64-2019`: Visual Studio 2019
+* `win32-mingw`: MinGW
+* `win64-mingw`: MinGW-w64 
+* `linux32`, `linux64`: GCC or Clang on Linux with C++11 support
+* `linux32-universal`, linux64-universal: GCC on Linux with statically linked libstdc++ for using on older Linux systems without C++11 support
+* `mac10.7`, `mac10.8`, `mac10.9`, `mac10.10`, `mac10.11`, `mac10.12`, `mac10.12`, `mac10.13`, `mac10.14`, `mac10.15`: target Mac OS X or macOS
+* `mac-universal`: targeting Mac OS X 10.7 as first version with C++11 support, should work on all Mac OS X 10.7+ systems
+
+### Build bindings for .NET, Java or Python:
+First you need to build Indigo native libraries (see previous section). Then
+```bash
+python build_scripts/indigo-make-by-libs.py --type=<wrapper_type>
+```
+There are following wrappers:
+* `dotnet` for .NET Standard 2.0
+* `java` for Java 1.6+
+* `python` for Python 2.7 and 3.0+
+You may also select comma-separated list of them, or skip `type` selection to build all wrappers.
+#### .NET build dependencies
+* .NET Core SDK 2.0+ (that supports targeting .NET Standard 2.0), and `dotnet` executable in PATH.
+* `powershell` command in PATH. On Linux you may need to run `ln -fs /usr/bin/pwsh /usr/bin/powershell` before 
+building wrappers.
+#### Java build dependencies
+* JDK 1.6+.
+* Maven 3+, `mvn` in PATH.
+
+### Build native Indigo utils
+`````bash
+python build_scripts/indigo-release-utils.py 
+`````
+Compiler presets could be also specified for building utils, see "Build native Indigo libraries" section for details.
+### Build Java Utils
+First you need to build Indigo native libraries and wrappers for Java (see previous sections).
+Then run
+`````bash
+python build_scripts/indigo-release-java-utils.py
+`````

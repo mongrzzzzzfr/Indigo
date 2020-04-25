@@ -8,6 +8,8 @@ from optparse import OptionParser
 from zipfile import ZipFile
 
 import sys
+sys.path.append(os.path.dirname(__file__))
+irl = __import__('indigo-release-libs')
 
 
 def get_cpu_count():
@@ -50,26 +52,6 @@ def getBingoVersion():
             version = m.group(1)
     return version
 
-presets = {
-    "win32-2013": ("Visual Studio 12", ""),
-    "win32-2015": ("Visual Studio 14", ""),
-    "win64-2013": ("Visual Studio 12 Win64", ""),
-    "win64-2015": ("Visual Studio 14 Win64", ""),
-    "win32-mingw": ("MinGW Makefiles", ""),
-    "linux32": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
-    "linux32-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
-    "linux64": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
-    "linux64-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
-    "mac10.7": ("Xcode", "-DSUBSYSTEM_NAME=10.7"),
-    "mac10.8": ("Xcode", "-DSUBSYSTEM_NAME=10.8"),
-    "mac10.9": ("Xcode", "-DSUBSYSTEM_NAME=10.9"),
-    "mac10.10": ("Xcode", "-DSUBSYSTEM_NAME=10.10"),
-    "mac10.11": ("Xcode", "-DSUBSYSTEM_NAME=10.11"),
-    "mac10.12": ("Xcode", "-DSUBSYSTEM_NAME=10.12"),
-    "mac10.13": ("Xcode", "-DSUBSYSTEM_NAME=10.13"),
-    "mac-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=10.7"),
-}
-
 parser = OptionParser(description='Bingo build script')
 parser.add_option('--generator', help='this option is passed as -G option for cmake')
 parser.add_option('--params', default="", help='additional build parameters')
@@ -77,7 +59,7 @@ parser.add_option('--config', default="Release", help='project configuration')
 parser.add_option('--dbms', help='DMBS (oracle, postgres or sqlserver)')
 parser.add_option('--nobuild', default=False, action="store_true", help='configure without building', dest="nobuild")
 parser.add_option('--clean', default=False, action="store_true", help='delete all the build data', dest="clean")
-parser.add_option('--preset', type="choice", dest="preset", choices=list(presets.keys()), help='build preset %s' % (str(presets.keys())))
+parser.add_option('--preset', type="choice", dest="preset", choices=list(irl.PRESETS.keys()), help='build preset %s' % (str(irl.PRESETS.keys())))
 parser.add_option('--no-multithreaded-build', dest='mtbuild', default=True, action='store_false', help='Use only 1 core to build')
 
 (args, left_args) = parser.parse_args()
@@ -85,11 +67,7 @@ if len(left_args) > 0:
     print("Unexpected arguments: %s" % (str(left_args)))
     exit()
 
-if args.preset:
-    args.generator, args.params = presets[args.preset]
-if not args.generator and args.dbms != 'sqlserver':
-    print("Generator must be specified")
-    exit()
+_, args = irl.get_generator(args)
 
 if args.preset and 'universal' in args.preset:
     args.params += ' -DUNIVERSAL_BUILD=TRUE'
@@ -129,7 +107,9 @@ if args.dbms != 'sqlserver':
         args.params += " -DCMAKE_BUILD_TYPE=" + args.config
 
     os.chdir(full_build_dir)
-    command = "%s cmake -G \"%s\" %s %s" % ('CC=gcc CXX=g++' if (args.preset.find('linux') != -1 and args.preset.find('universal') != -1) else '', args.generator, args.params, project_dir)
+    cc_selection = 'CC=gcc CXX=g++' if args.preset and 'linux' in args.preset and 'universal' in args.preset.find else ''
+    generator_selection = '-G \"%s\"' if args.generator else ''
+    command = "%s cmake %s %s %s" % (cc_selection, generator_selection, args.params, project_dir)
     print(command)
     subprocess.check_call(command, shell=True)
 
@@ -186,43 +166,47 @@ if args.dbms != 'sqlserver':
 else:
     dllPath = {}
 
-    vsversion = 'Visual Studio'
-    if args.preset.find("2012") != -1:
-        vsversion += ' 11'
+    generator = ''
+    if not args.preset:
+        pass
     elif args.preset.find("2013") != -1:
-        vsversion += ' 12'
+        generator = 'Visual Studio 12 2013 Win64'
     elif args.preset.find("2015") != -1:
-        vsversion += ' 14'
+        generator = 'Visual Studio 14 2015 Win64'
+    elif args.preset.find("2017") != -1:
+        generator = 'Visual Studio 15 2017 Win64'
+    elif args.preset.find("2019") != -1:
+        generator += 'Visual Studio 16 2019'
     else:
-        vsversion += ' 10'
+        raise ValueError('Unsupported version of compiler, need Visual Studio to build SqlServer wrappers')
 
-    for arch, generator in (('x86', vsversion), ('x64', vsversion + ' Win64')):
-        build_dir = (shortenDBMS(args.dbms) + " " + shortenGenerator(generator) + " " + args.params)
-        build_dir = build_dir.replace(" ", "_").replace("=", "_").replace("-", "_")
-        full_build_dir = os.path.join(root, "build", build_dir)
-        dllPath[arch] = os.path.normpath(os.path.join(full_build_dir, 'dist', 'Win', arch, 'lib', args.config))
-        if os.path.exists(full_build_dir) and args.clean:
-            print("Removing previous project files")
-            shutil.rmtree(full_build_dir)
-        if not os.path.exists(full_build_dir):
-            os.makedirs(full_build_dir)
-        os.chdir(full_build_dir)
-        command = "cmake -G \"%s\" %s %s" % (generator, args.params, project_dir)
-        print(command)
-        subprocess.check_call(command, shell=True)
+    build_dir = (shortenDBMS(args.dbms) + " " + shortenGenerator(generator) + " " + args.params)
+    build_dir = build_dir.replace(" ", "_").replace("=", "_").replace("-", "_")
+    full_build_dir = os.path.join(root, "build", build_dir)
+    dllPath = os.path.normpath(os.path.join(full_build_dir, 'dist', 'Win64', 'lib', args.config))
+    if os.path.exists(full_build_dir) and args.clean:
+        print("Removing previous project files")
+        shutil.rmtree(full_build_dir)
+    if not os.path.exists(full_build_dir):
+        os.makedirs(full_build_dir)
+    os.chdir(full_build_dir)
+    generator_selection = '-G \"%s\"' if generator else ''
+    command = "cmake %s %s %s" % (generator_selection, args.params, project_dir)
+    print(command)
+    subprocess.check_call(command, shell=True)
 
-        if args.nobuild:
-            exit(0)
+    if args.nobuild:
+        exit(0)
 
-        for f in os.listdir(full_build_dir):
-            path, ext = os.path.splitext(f)
-            if ext == ".zip":
-                os.remove(join(full_build_dir, f))
+    for f in os.listdir(full_build_dir):
+        path, ext = os.path.splitext(f)
+        if ext == ".zip":
+            os.remove(join(full_build_dir, f))
 
-        subprocess.check_call("cmake --build . --config %s" % args.config, shell=True)
+    subprocess.check_call("cmake --build . --config %s" % args.config, shell=True)
 
     os.chdir(join(root, 'bingo', 'sqlserver'))
-    command = 'msbuild /t:Rebuild /p:Configuration=%s /property:DllPath32=%s /property:DllPath64=%s' % (args.config, dllPath['x86'], dllPath['x64'])
+    command = 'msbuild /t:Rebuild /p:Configuration=%s /property:DllPath64=%s' % (args.config, dllPath)
     print(os.path.abspath(os.curdir), command)
     subprocess.check_call(command)
 

@@ -22,71 +22,38 @@ else:
     check_call = subprocess.check_call
 
 
-def get_cpu_count():
-    if os.name == 'java':
-        from java.lang import Runtime
-        runtime = Runtime.getRuntime()
-        cpu_count = runtime.availableProcessors()
-    else:
-        import multiprocessing
-        cpu_count = multiprocessing.cpu_count()
-    return cpu_count
+PRESETS = {
+    "win32-2013": ("Visual Studio 12", ""),
+    "win32-2015": ("Visual Studio 14", ""),
+    "win32-2017": ("Visual Studio 15", ""),
+    "win32-2019": ("Visual Studio 16 2019", "-A Win32"),
+    "win64-2013": ("Visual Studio 12 Win64", ""),
+    "win64-2015": ("Visual Studio 14 Win64", ""),
+    "win64-2017": ("Visual Studio 15 Win64", ""),
+    "win64-2019": ("Visual Studio 16 2019", ""),
+    "win32-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x86"),
+    "win64-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x64"),
+    "linux32": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
+    "linux32-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
+    "linux64": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
+    "linux64-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
+    "mac10.7": ("Xcode", "-DSUBSYSTEM_NAME=10.7"),
+    "mac10.8": ("Xcode", "-DSUBSYSTEM_NAME=10.8"),
+    "mac10.9": ("Xcode", "-DSUBSYSTEM_NAME=10.9"),
+    "mac10.10": ("Xcode", "-DSUBSYSTEM_NAME=10.10"),
+    "mac10.11": ("Xcode", "-DSUBSYSTEM_NAME=10.11"),
+    "mac10.12": ("Xcode", "-DSUBSYSTEM_NAME=10.12"),
+    "mac10.13": ("Xcode", "-DSUBSYSTEM_NAME=10.13"),
+    "mac10.14": ("Xcode", "-DSUBSYSTEM_NAME=10.14"),
+    "mac10.15": ("Xcode", "-DSUBSYSTEM_NAME=10.15"),
+    "mac-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=10.7"),
+}
 
 
-def build_libs(cl_args):
-    presets = {
-        "win32-2013": ("Visual Studio 12", ""),
-        "win32-2015": ("Visual Studio 14", ""),
-        "win32-2017": ("Visual Studio 15", ""),
-        "win32-2019": ("Visual Studio 16 2019", "-A Win32"),
-        "win64-2013": ("Visual Studio 12 Win64", ""),
-        "win64-2015": ("Visual Studio 14 Win64", ""),
-        "win64-2017": ("Visual Studio 15 Win64", ""),
-        "win64-2019": ("Visual Studio 16 2019", ""),
-        "win32-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x86"),
-        "win64-mingw": ("MinGW Makefiles", "-DSUBSYSTEM_NAME=x64"),
-        "linux32": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
-        "linux32-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x86"),
-        "linux64": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
-        "linux64-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=x64"),
-        "mac10.7": ("Xcode", "-DSUBSYSTEM_NAME=10.7"),
-        "mac10.8": ("Xcode", "-DSUBSYSTEM_NAME=10.8"),
-        "mac10.9": ("Xcode", "-DSUBSYSTEM_NAME=10.9"),
-        "mac10.10": ("Xcode", "-DSUBSYSTEM_NAME=10.10"),
-        "mac10.11": ("Xcode", "-DSUBSYSTEM_NAME=10.11"),
-        "mac10.12": ("Xcode", "-DSUBSYSTEM_NAME=10.12"),
-        "mac10.13": ("Xcode", "-DSUBSYSTEM_NAME=10.13"),
-        "mac10.14": ("Xcode", "-DSUBSYSTEM_NAME=10.14"),
-        "mac-universal": ("Unix Makefiles", "-DSUBSYSTEM_NAME=10.7"),
-    }
-
-    parser = OptionParser(description='Indigo libraries build script')
-    parser.add_option('--generator', help='this option is passed as -G option for cmake')
-    parser.add_option('--params', default="", help='additional build parameters')
-    parser.add_option('--config', default="Release", help='project configuration')
-    parser.add_option('--nobuild', default=False, action="store_true", help='configure without building', dest="nobuild")
-    parser.add_option('--clean', default=False, action="store_true", help='delete all the build data', dest="clean")
-    parser.add_option('--preset', type="choice", dest="preset", choices=list(presets.keys()), help='build preset %s' % (str(list(presets.keys()))))
-    parser.add_option('--with-static', action='store_true', help='Build Indigo static libraries', default=False, dest='withStatic')
-    parser.add_option('--verbose', action='store_true', help='Show verbose build information', default=False, dest='buildVerbose')
-    parser.add_option('--cairo-gl', dest="cairogl", default=False, action="store_true", help='Build Cairo with OpenGL support')
-    parser.add_option('--cairo-vg', dest="cairovg", default=False, action="store_true", help='Build Cairo with CairoVG support')
-    parser.add_option('--cairo-egl', dest="cairoegl", default=False, action="store_true", help='Build Cairo with EGL support')
-    parser.add_option('--cairo-glesv2', dest="cairoglesv2", default=False, action="store_true", help='Build Cairo with GLESv2 support')
-    parser.add_option('--find-cairo', dest="findcairo", default=False, action="store_true", help='Find and use system Cairo')
-    parser.add_option('--find-pixman', dest="findpixman", default=False, action="store_true", help='Find and use system Pixman')
-    parser.add_option('--no-multithreaded-build', dest='mtbuild', default=True, action='store_false', help='Use only 1 core to build')
-    if os.name == 'posix':
-        parser.add_option('--check-abi', dest='checkabi', default=False, action="store_true", help='Check ABI type of Indigo libraries on Linux')
-
-    (args, left_args) = parser.parse_args(cl_args)
-    if len(left_args) > 0:
-        print("Unexpected arguments: %s" % (str(left_args)))
-        exit()
-
+def get_generator(args):
     auto_vs = False
     if args.preset:
-        args.generator, args.params = presets[args.preset]
+        args.generator, args.params = PRESETS[args.preset]
     else:
         if os.name == 'java':
             from java.lang import System
@@ -106,10 +73,50 @@ def build_libs(cl_args):
             raise NotImplementedError('Unsupported OS: {}'.format(system))
         if preset:
             print("Auto-selecting preset: {}".format(preset))
-            args.generator, args.params = presets[preset]
+            args.generator, args.params = PRESETS[preset]
         else:
             print("Preset is no selected, continuing with empty generator and params...")
             args.generator, args.params = '', ''
+    return auto_vs, args
+
+
+def get_cpu_count():
+    if os.name == 'java':
+        from java.lang import Runtime
+        runtime = Runtime.getRuntime()
+        cpu_count = runtime.availableProcessors()
+    else:
+        import multiprocessing
+        cpu_count = multiprocessing.cpu_count()
+    return cpu_count
+
+
+def build_libs(cl_args):
+    parser = OptionParser(description='Indigo libraries build script')
+    parser.add_option('--generator', help='this option is passed as -G option for cmake')
+    parser.add_option('--params', default="", help='additional build parameters')
+    parser.add_option('--config', default="Release", help='project configuration')
+    parser.add_option('--nobuild', default=False, action="store_true", help='configure without building', dest="nobuild")
+    parser.add_option('--clean', default=False, action="store_true", help='delete all the build data', dest="clean")
+    parser.add_option('--preset', type="choice", dest="preset", choices=list(PRESETS.keys()), help='build preset %s' % (str(list(PRESETS.keys()))))
+    parser.add_option('--with-static', action='store_true', help='Build Indigo static libraries', default=False, dest='withStatic')
+    parser.add_option('--verbose', action='store_true', help='Show verbose build information', default=False, dest='buildVerbose')
+    parser.add_option('--cairo-gl', dest="cairogl", default=False, action="store_true", help='Build Cairo with OpenGL support')
+    parser.add_option('--cairo-vg', dest="cairovg", default=False, action="store_true", help='Build Cairo with CairoVG support')
+    parser.add_option('--cairo-egl', dest="cairoegl", default=False, action="store_true", help='Build Cairo with EGL support')
+    parser.add_option('--cairo-glesv2', dest="cairoglesv2", default=False, action="store_true", help='Build Cairo with GLESv2 support')
+    parser.add_option('--find-cairo', dest="findcairo", default=False, action="store_true", help='Find and use system Cairo')
+    parser.add_option('--find-pixman', dest="findpixman", default=False, action="store_true", help='Find and use system Pixman')
+    parser.add_option('--no-multithreaded-build', dest='mtbuild', default=True, action='store_false', help='Use only 1 core to build')
+    if os.name == 'posix':
+        parser.add_option('--check-abi', dest='checkabi', default=False, action="store_true", help='Check ABI type of Indigo libraries on Linux')
+
+    (args, left_args) = parser.parse_args(cl_args)
+    if len(left_args) > 0:
+        print("Unexpected arguments: %s" % (str(left_args)))
+        exit()
+
+    auto_vs, args = get_generator(args)
 
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     root = os.path.join(cur_dir, "..")
