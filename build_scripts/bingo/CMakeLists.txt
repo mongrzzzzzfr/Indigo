@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 
 project(Bingo C CXX)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../../common/cmake/)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ../../core/common/cmake/)
 
 INCLUDE(ConfigureCommon)
 

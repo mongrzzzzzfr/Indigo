@@ -12,12 +12,11 @@ configure_file(${Indigo_SOURCE_DIR}/src/indigo_version.h.in ${Indigo_SOURCE_DIR}
 file (GLOB Indigo_src src/*.c*)
 file (GLOB Indigo_headers *.h* src/*.h*)
 
-# Get defined variable with the headers for TinyXML
-get_directory_property(TinyXML_HEADERS_DIR DIRECTORY ../third_party/tinyxml DEFINITION TinyXML_HEADERS_DIR)
-
 include_directories(${Indigo_SOURCE_DIR} ${Common_SOURCE_DIR} ${Common_SOURCE_DIR}/.. ${TinyXML_HEADERS_DIR} ${InChI_SOURCE_DIR}/inchi_dll)
 
 add_library(indigoObj OBJECT ${Indigo_src} ${Indigo_headers})
+target_link_libraries(indigoObj PUBLIC molecule
+                                PUBLIC reaction)
 set_target_properties(indigoObj PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")
 
 #Indigo static
@@ -34,7 +33,6 @@ endif()
 
 # Indigo shared
 add_library(indigo-shared SHARED $<TARGET_OBJECTS:indigoObj> $<TARGET_OBJECTS:graph> $<TARGET_OBJECTS:layout> $<TARGET_OBJECTS:molecule> $<TARGET_OBJECTS:common> $<TARGET_OBJECTS:reaction> ${Common_SOURCE_DIR}/hacks/memcpy.c)
-
 # Copy shared library to indigo/api/libs/shared/ folder, that is used by python tests and wrappers generation
 add_custom_command(
         TARGET indigo-shared
@@ -56,12 +54,7 @@ endif()
 if (MSVC OR MINGW)
     set_target_properties(indigo-shared PROPERTIES PREFIX "")
 endif()
-target_link_libraries(indigo-shared z tinyxml inchi)
-if(UNIX AND NOT APPLE)
-    set_property(TARGET indigo-shared PROPERTY LINK_INTERFACE_LIBRARIES "-lpthread;-lrt;z;tinyxml;inchi")
-else()
-    set_property(TARGET indigo-shared PROPERTY LINK_INTERFACE_LIBRARIES "z;tinyxml;inchi")
-endif()
+target_link_libraries(indigo-shared inchi molecule common)
 set_property(TARGET indigo-shared PROPERTY FOLDER "indigo")
 if (NOT PACK_INDIGO_NOT)
     pack_shared(indigo-shared)

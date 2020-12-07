@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.4)
 project(BingoPostgresSolution C CXX)
 
 set(BINGO "YES")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../../common/cmake/)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ../../core/common/cmake/)
 set(Bingo_SOURCE_DIR ../../bingo/)
 
 INCLUDE(ConfigureCommon)
@@ -23,7 +23,7 @@ add_subdirectory(../../third_party/zlib-src "${CMAKE_CURRENT_BINARY_DIR}/zlib")
 # Get defined variable with the headers
 get_directory_property(ZLib_HEADERS_DIR DIRECTORY ../../third_party/zlib-src DEFINITION ZLib_HEADERS_DIR)
 
-add_subdirectory(../../common "${CMAKE_CURRENT_BINARY_DIR}/common")
+add_subdirectory(../../core/common "${CMAKE_CURRENT_BINARY_DIR}/common")
 
 add_subdirectory(../../third_party/tinyxml "${CMAKE_CURRENT_BINARY_DIR}/tinyxml")
 # Get defined variable with the headers

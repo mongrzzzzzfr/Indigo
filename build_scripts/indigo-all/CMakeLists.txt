@@ -6,7 +6,7 @@ if (NOT DEFINED ENV{DISABLE_INDIGO_TESTS})
 	ENABLE_TESTING()
 endif()
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../../common/cmake/)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ../../core/common/cmake/)
 
 INCLUDE(ConfigureCommon)
 

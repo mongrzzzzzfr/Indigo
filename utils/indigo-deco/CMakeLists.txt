@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.4)
 project(IndigoDeco)
 
 include(DefineTest)
-include_directories(../../api ../../common)
+include_directories(../../api ../../core/common)
 
 add_executable(indigo-deco main.c)
 target_link_libraries(indigo-deco indigo)

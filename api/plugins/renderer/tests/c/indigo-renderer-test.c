@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "indigo-renderer.h"
 #include "indigo.h"
@@ -29,7 +28,7 @@ void testHDC()
     molecule = indigoLoadMoleculeFromString("C1=CC=CC=C1");
     indigoSetOption("render-output-format", "png");
     indigoSetOption("render-background-color", "255, 255, 255");
-    indigoRenderToFile(molecule, "indigo-renderer-test.png");
+    indigoRenderToFile(molecule, "indigo-renderer-test-hdc.png");
 
     buffer_object = indigoWriteBuffer();
     indigoRender(molecule, buffer_object);
@@ -60,11 +59,11 @@ int main(void)
     printf("%s\n", indigoCanonicalSmiles(m));
 
     indigoSetOption("render-output-format", "png");
-    indigoSetOption("render-atom-ids-visible", "true");
-    indigoSetOption("render-bond-ids-visible", "true");
+    // indigoSetOption("render-atom-ids-visible", "true");
+    // indigoSetOption("render-bond-ids-visible", "true");
     indigoSetOption("render-background-color", "255, 255, 255");
     indigoRenderToFile(m, "indigo-renderer-test.png");
 
-    testHDC();
+    // testHDC();
     return 0;
 }

@@ -5,7 +5,7 @@ project(IndigoDepict)
 include(DefineTest)
 
 
-include_directories(../../api ../../api/plugins/renderer ../../common)
+include_directories(../../api ../../api/plugins/renderer ../../core/common)
 include_directories(${IndigoRenderer_SOURCE_DIR} ${Indigo_SOURCE_DIR} ${Indigo_SOURCE_DIR}/src ${Cairo_SOURCE_DIR} ${Common_SOURCE_DIR} ${Common_SOURCE_DIR}/..)
 
 
