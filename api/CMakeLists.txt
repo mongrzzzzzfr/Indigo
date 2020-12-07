@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.4)
 
-project(Indigo)
+project(indigo)
 
 include(indigo-version.cmake)
-include(DefineTest)
 
 MESSAGE(STATUS "Indigo version is ${INDIGO_VERSION}")
 SET(INDIGO_VERSION "${INDIGO_VERSION}" PARENT_SCOPE) # promote Indigo version

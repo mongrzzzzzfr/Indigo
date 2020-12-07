@@ -6,7 +6,6 @@ from env_indigo import *
 indigo = Indigo()
 indigo.setOption("molfile-saving-skip-date", "1")
 
-
 mol = indigo.loadMoleculeFromFile(joinPath("molecules/test_json.json"))
 print(mol.molfile())
 
