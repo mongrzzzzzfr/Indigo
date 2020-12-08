@@ -18,20 +18,31 @@ else()
     list(FILTER ${PROJECT_NAME}_SOURCES EXCLUDE REGEX .*win32\.cp*$)
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/inchi)
-
-conan_cmake_run(REQUIRES
-        zlib/1.2.11
-        tinyxml/2.6.2
-        rapidjson/cci.20200410
-        BASIC_SETUP CMAKE_TARGETS
-        BUILD missing)
 add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SOURCES})
-target_link_libraries(${PROJECT_NAME}
-        PUBLIC inchi
-        PUBLIC CONAN_PKG::rapidjson
-        PUBLIC CONAN_PKG::tinyxml
-        PUBLIC CONAN_PKG::zlib)
+if (BUILD_SELF_SUFFICIENT)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/inchi)
+    conan_cmake_run(REQUIRES
+            zlib/1.2.11
+            tinyxml/2.6.2
+            rapidjson/cci.20200410
+            BASIC_SETUP CMAKE_TARGETS
+            BUILD missing)
+    target_link_libraries(${PROJECT_NAME}
+            PUBLIC inchi
+            PUBLIC CONAN_PKG::rapidjson
+            PUBLIC CONAN_PKG::tinyxml
+            PUBLIC CONAN_PKG::zlib)
+else()
+    find_package(InChI REQUIRED)
+    find_package(TinyXML REQUIRED)
+    find_package(ZLIB REQUIRED)
+    find_package(RapidJSON REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+            PUBLIC InChI::InChI
+            PUBLIC RapidJSON::RapidJSON
+            PUBLIC TinyXML::TinyXML
+            PUBLIC ZLIB::ZLIB)
+endif()
 target_include_directories(${PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/common
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)

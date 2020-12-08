@@ -8,8 +8,13 @@ file(GLOB ${PROJECT_NAME}_SOURCES CONFIGURE_DEPENDS
 add_library(${PROJECT_NAME}-object OBJECT ${${PROJECT_NAME}_SOURCES})
 target_link_libraries(${PROJECT_NAME}-object
         PUBLIC bingo-core)
-target_include_directories(${PROJECT_NAME}-object
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-object>)
+target_link_libraries(${PROJECT_NAME}-static
+        PUBLIC bingo-core)
+target_include_directories(${PROJECT_NAME}-static
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:${PROJECT_NAME}-object>)
+target_link_libraries(${PROJECT_NAME}
+        PUBLIC bingo-core)

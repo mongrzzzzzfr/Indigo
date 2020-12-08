@@ -24,7 +24,7 @@
 #include "molecule/elements.h"
 #include "molecule/molecule.h"
 #include "molecule/molecule_dearom.h"
-#include "mode.h"
+// #include "mode.h"
 
 
 using namespace indigo;
@@ -72,7 +72,7 @@ private:
 
 const char* InchiWrapper::version()
 {
-    return APP_DESCRIPTION;
+    return "1.03";
 }
 
 InchiWrapper::InchiWrapper()
