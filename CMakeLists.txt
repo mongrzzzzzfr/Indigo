@@ -34,6 +34,10 @@ endif()
 # Set up compiler flags and other preparatory steps
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/setup.cmake)
 
+# set(PACKAGE_COMMANDS "")
+
+add_custom_target(package)
+
 add_subdirectory(core)
 add_subdirectory(api)
 add_subdirectory(bingo)

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(indigo-tests LANGUAGES C CXX)
 
-if (TEST)
+if (ENABLE_TESTS)
     add_executable(${PROJECT_NAME}-dlopen ${CMAKE_CURRENT_SOURCE_DIR}/indigo-test-dlopen.c)
     target_link_libraries(${PROJECT_NAME}-dlopen ${CMAKE_DL_LIBS})
     add_test(NAME ${PROJECT_NAME}-dlopen-indigo COMMAND ${PROJECT_NAME}-dlopen ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libindigo.so)

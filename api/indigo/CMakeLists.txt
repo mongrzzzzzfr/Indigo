@@ -17,6 +17,28 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-if (TEST)
+if (ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
+
+install(TARGETS ${PROJECT_NAME}
+        LIBRARY DESTINATION lib)
+install(FILES indigo.h DESTINATION .)
+
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VERSION ${INDIGO_VERSION})
+string(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_LOWER)
+set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME_LOWER}-${CMAKE_SYSTEM_PROCESSOR}")
+if (UNIX)
+    set(CPACK_GENERATOR "TGZ")
+else()
+    set(CPACK_GENERATOR "ZIP")
+endif()
+set(CPACK_VERBATIM_VARIABLES YES)
+set(CPACK_OUTPUT_CONFIG_FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.CPackConfig.cmake)
+include(CPack)
+
+add_custom_target(package-${PROJECT_NAME}
+        COMMAND "${CMAKE_CPACK_COMMAND}"
+        "-C" "$<CONFIGURATION>" "--config" "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.CPackConfig.cmake")
+add_dependencies(package package-${PROJECT_NAME})

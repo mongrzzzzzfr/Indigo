@@ -30,11 +30,14 @@ else()
 endif()
 
 install(TARGETS ${PROJECT_NAME}
-        LIBRARY DESTINATION lib)
-install(DIRECTORY sql/common/ DESTINATION sql)
-install(DIRECTORY sql/${PostgreSQL_VERSION}/ DESTINATION sql)
-install(FILES bingo-pg-install.bat bingo-pg-install.sh README.md DESTINATION .)
-
+        LIBRARY DESTINATION lib
+        COMPONENT ${PROJECT_NAME})
+install(DIRECTORY sql/common/ DESTINATION sql
+        COMPONENT ${PROJECT_NAME})
+install(DIRECTORY sql/${PostgreSQL_VERSION}/ DESTINATION sql
+        COMPONENT ${PROJECT_NAME})
+install(FILES bingo-pg-install.bat bingo-pg-install.sh README.md DESTINATION .
+        COMPONENT ${PROJECT_NAME})
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}${PostgreSQL_VERSION}")
 set(CPACK_PACKAGE_VERSION ${BINGO_VERSION})
 string(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_LOWER)
@@ -46,4 +49,12 @@ else()
     set(CPACK_GENERATOR "ZIP")
 endif()
 set(CPACK_VERBATIM_VARIABLES YES)
+message(STATUS ${CPACK_OUTPUT_CONFIG_FILE})
+set(CPACK_OUTPUT_CONFIG_FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.CPackConfig.cmake)
+
 include(CPack)
+
+add_custom_target(package-${PROJECT_NAME}
+        COMMAND "${CMAKE_CPACK_COMMAND}"
+        "-C" "$<CONFIGURATION>" "--config" "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.CPackConfig.cmake")
+add_dependencies(package package-${PROJECT_NAME})
