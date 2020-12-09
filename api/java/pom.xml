@@ -120,7 +120,7 @@
         </plugins>
         <resources>
             <resource>
-                <directory>../libs/shared</directory>
+                <directory>../../dist/lib</directory>
                 <excludes>
                     <exclude>**/*.lib</exclude>
                 </excludes>

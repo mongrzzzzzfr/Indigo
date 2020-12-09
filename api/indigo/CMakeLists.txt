@@ -27,7 +27,6 @@ install(FILES indigo.h DESTINATION .)
 
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VERSION ${INDIGO_VERSION})
-string(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_LOWER)
 set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME_LOWER}-${CMAKE_SYSTEM_PROCESSOR}")
 if (UNIX)
     set(CPACK_GENERATOR "TGZ")
@@ -42,3 +41,10 @@ add_custom_target(package-${PROJECT_NAME}
         COMMAND "${CMAKE_CPACK_COMMAND}"
         "-C" "$<CONFIGURATION>" "--config" "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.CPackConfig.cmake")
 add_dependencies(package package-${PROJECT_NAME})
+
+if (PREPARE_INDIGO_BINDINGS)
+    add_custom_target(before-bindings-${PROJECT_NAME}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${INDIGO_CURRENT_NATIVE_LIBS_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${INDIGO_CURRENT_NATIVE_LIBS_DIRECTORY})
+    add_dependencies(before-bindings before-bindings-${PROJECT_NAME})
+endif()

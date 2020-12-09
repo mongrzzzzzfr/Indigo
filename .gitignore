@@ -52,3 +52,9 @@ api/tests/dotnet/obj/
 api/tests/python/**/out
 **/.__pycache__
 *.pyo
+api/python/epam.indigo.egg-info
+api/python/indigo/lib
+*.jar
+*.nupkg
+*.whl
+

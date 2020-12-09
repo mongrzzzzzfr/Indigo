@@ -1,0 +1,109 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp5</TargetFramework>
+    <RootNamespace>com.epam.indigo</RootNamespace>
+
+    <IsPackable>false</IsPackable>
+
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Indigo.Net.csproj"  PrivateAssets="None"/>
+  </ItemGroup>
+
+<!--   <Target BeforeTargets="PostBuildEvent" Name="PostBuild"> -->
+<!--     <Exec Command="powershell -ExecutionPolicy Bypass -NoProfile -NonInteractive -File $(ProjectDir)/../src/prebuild.ps1" /> -->
+<!--   </Target> -->
+
+	<ItemGroup>
+		<Content Include="lib/linux-x86_64/libindigo.so">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/linux-x64/native/libindigo.so</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/darwin-x86_64/libindigo.dylib">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/osx-x64/native/libindigo.dylib</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64/indigo.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/indigo.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64/concrt140.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/concrt140.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64//msvcp140.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/msvcp140.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64//vcruntime140.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/vcruntime140.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64/vcruntime140_1.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/vcruntime140_1.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/linux-x86_64/libindigo-inchi.so">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/linux-x64/native/libindigo-inchi.so</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/darwin-x86_64/libindigo-inchi.dylib">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/osx-x64/native/libindigo-inchi.dylib</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64/indigo-inchi.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/indigo-inchi.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/linux-x86_64/libindigo-renderer.so">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/linux-x64/native/libindigo-renderer.so</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/darwin-x86_64/libindigo-renderer.dylib">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/osx-x64/native/libindigo-renderer.dylib</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64/indigo-renderer.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/indigo-renderer.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/linux-x86_64/libbingo-nosql.so">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/linux-x64/native/libbingo-nosql.so</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/darwin-x86_64/libbingo-nosql.dylib">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/osx-x64/native/libbingo-nosql.dylib</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="lib/windows-x86_64/bingo-nosql.dll">
+			<Pack>false</Pack>
+			<PackagePath>runtimes/win-x64/native/bingo-nosql.dll</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+</Project>

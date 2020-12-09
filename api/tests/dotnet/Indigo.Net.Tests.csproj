@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RootNamespace>indigo_tests</RootNamespace>
+    <TargetFramework>netcoreapp5</TargetFramework>
+    <RootNamespace>com.epam.indigo</RootNamespace>
 
     <IsPackable>false</IsPackable>
 
@@ -17,10 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\dotnet\Indigo.Net.csproj" />
-    <ProjectReference Include="..\..\plugins\bingo\dotnet\Bingo.Net.csproj" />
-    <ProjectReference Include="..\..\plugins\inchi\dotnet\IndigoInchi.Net.csproj" />
-    <ProjectReference Include="..\..\plugins\renderer\dotnet\IndigoRenderer.Net.csproj" />
   </ItemGroup>
-
 
 </Project>

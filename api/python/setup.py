@@ -1,5 +1,7 @@
 import distutils.dir_util
+import glob
 import os
+import shutil
 import sys
 
 from setuptools import setup
@@ -31,21 +33,22 @@ Also capable of performing a molecular similarity search, it is 100% open source
 as well as a documented API for developers."
 
 INDIGO_LIBS = None
+PLATFORM_NAME = None
 
 if sys.argv[1] == "bdist_wheel":
     for opt in sys.argv[2:]:
         if opt.startswith("--plat-name"):
-            name = opt.split("=")[1]
-            if name.startswith("macosx_10_7_intel"):
-                INDIGO_LIBS = "lib/Mac/10.7/*.dylib"
-            elif name == "manylinux1_x86_64":
-                INDIGO_LIBS = "lib/Linux/x64/*.so"
-            elif name == "manylinux1_i686":
-                INDIGO_LIBS = "lib/Linux/x86/*.so"
-            elif name == "win_amd64":
-                INDIGO_LIBS = "lib/Win/x64/*.dll"
-            elif name == "win32":
-                INDIGO_LIBS = "lib/Win/x86/*.dll"
+            PLATFORM_NAME = opt.split("=")[1]
+            if PLATFORM_NAME.startswith("macosx_10_7_intel"):
+                INDIGO_LIBS = "lib/darwin-x86_64/*.dylib"
+            elif PLATFORM_NAME == "manylinux1_x86_64":
+                INDIGO_LIBS = "lib/linux-x86_64/*.so"
+            elif PLATFORM_NAME == "manylinux1_i686":
+                INDIGO_LIBS = "lib/linux-i386/*.so"
+            elif PLATFORM_NAME == "win_amd64":
+                INDIGO_LIBS = "lib/windows-x86_64/*.dll"
+            elif PLATFORM_NAME == "win32":
+                INDIGO_LIBS = "lib/windows-i386/*.dll"
             break
 
 if not INDIGO_LIBS:
@@ -53,10 +56,26 @@ if not INDIGO_LIBS:
         "Wrong --plat-name value! Should be one of: macosx_10_7_intel, manylinux1_x86_64, manylinux1_i686, win_amd64, win32"
     )
 
+this_dir = os.path.dirname(os.path.abspath(__file__))
+repo_root_dir = os.path.dirname(os.path.dirname(this_dir))
+repo_dist_lib_dir = os.path.join(repo_root_dir, "dist", "lib")
+indigo_python_directory = os.path.join(this_dir, "indigo")
+indigo_native_libs_directory = os.path.join(indigo_python_directory, "lib")
+if not os.path.exists(indigo_native_libs_directory):
+    print("No native libs found in {}, looking for them in {}".format(indigo_native_libs_directory, repo_dist_lib_dir))
+    if os.path.exists(repo_dist_lib_dir):
+        print("Copying native libs from {}".format(repo_dist_lib_dir))
+        shutil.copytree(repo_dist_lib_dir, indigo_native_libs_directory)
+
+if not glob.glob(os.path.join(indigo_python_directory, INDIGO_LIBS)):
+    print("No native libs found for platform {}, exiting".format(PLATFORM_NAME))
+    exit(0)
+
 if os.path.exists("build"):
     distutils.dir_util.remove_tree("build")
 if os.path.exists("indigo_chem.egg-info"):
     distutils.dir_util.remove_tree("indigo_chem.egg-info")
+
 
 setup(
     name="epam.indigo",
