@@ -61,3 +61,5 @@ bin
 lib
 obj
 TestResults
+cmake-build-debug
+cmake-build-release
