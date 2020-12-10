@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.6)
 
 project(indigo LANGUAGES C CXX)
 
-include(indigo-version.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/indigo_version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/indigo_version.h)
 
 file(GLOB ${PROJECT_NAME}_SOURCES CONFIUGURE_DEPENDS

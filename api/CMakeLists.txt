@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.4)
 
 project(api)
 
+include(indigo-version.cmake)
+
 if (BUILD_INDIGO)
     if (PREPARE_INDIGO_BINDINGS)
         add_custom_target(before-bindings)
