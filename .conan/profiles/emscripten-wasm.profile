@@ -1,0 +1,13 @@
+include(default)
+[settings]
+os=Emscripten
+arch=wasm
+compiler=clang
+compiler.version=11
+compiler.libcxx=libc++
+[options]
+[build_requires]
+autoconf/2.69
+automake/1.16.3
+emsdk_installer/1.39.13@bincrafters/stable
+[env]

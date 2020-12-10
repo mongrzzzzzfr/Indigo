@@ -1,0 +1,12 @@
+[requires]
+rapidjson/cci.20200410
+tinyxml/2.6.2
+zlib/1.2.11
+cairo/1.17.2
+
+[options]
+cairo:shared=False
+cairo:with_xlib=False
+cairo:with_xlib_xrender=False
+cairo:with_xcb=False
+cairo:with_glib=False

@@ -16,7 +16,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-#include "bingo.h"
+#include "bingo-nosql.h"
 #include "bingo_object.h"
 
 #include "bingo_internal.h"

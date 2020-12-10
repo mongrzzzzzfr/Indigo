@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bingo.h"
+#include "bingo-nosql.h"
 #include "indigo.h"
 
 void onError(const char* message, void* context)
