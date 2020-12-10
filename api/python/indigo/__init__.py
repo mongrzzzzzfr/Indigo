@@ -2319,6 +2319,7 @@ class Indigo(object):
     SG_TYPE_ANY = 14
 
     _lib = None
+    _dll_path = None
     _native_libraries_handlers = []
 
     # Python embeds path into .pyc code if method is marked with @staticmethod
@@ -2346,6 +2347,7 @@ class Indigo(object):
         library_path = os.path.join(library_base_path, libraries_directory, library_name)
         if os.path.exists(library_path):
             Indigo._lib = CDLL(library_path, mode=RTLD_GLOBAL)
+            Indigo._dll_path = os.path.dirname(library_path)
             indigo_found = True
         if not indigo_found:
             raise IndigoException(

@@ -19,7 +19,7 @@ import os
 import platform
 from ctypes import CDLL, POINTER, c_char_p, c_int
 
-from indigo import IndigoException
+from indigo import IndigoException, DECODE_ENCODING
 
 
 class IndigoRenderer(object):
@@ -31,11 +31,11 @@ class IndigoRenderer(object):
             and not platform.mac_ver()[0]
             and not platform.system().startswith("CYGWIN")
         ):
-            self._lib = CDLL(indigo.dllpath + "/libindigo-renderer.so")
+            self._lib = CDLL(indigo._dll_path + "/libindigo-renderer.so")
         elif os.name == "nt" or platform.system().startswith("CYGWIN"):
-            self._lib = CDLL(indigo.dllpath + "\indigo-renderer.dll")
+            self._lib = CDLL(indigo._dll_path + "\indigo-renderer.dll")
         elif platform.mac_ver()[0]:
-            self._lib = CDLL(indigo.dllpath + "/libindigo-renderer.dylib")
+            self._lib = CDLL(indigo._dll_path + "/libindigo-renderer.dylib")
         else:
             raise IndigoException("unsupported OS: " + os.name)
 
@@ -68,6 +68,9 @@ class IndigoRenderer(object):
             return wb.toBuffer()
         finally:
             wb.dispose()
+
+    def renderToString(self, obj):
+        return self.renderToBuffer(obj).tobytes().decode(DECODE_ENCODING)
 
     def renderToFile(self, obj, filename):
         self.indigo._setSessionId()

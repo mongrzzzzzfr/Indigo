@@ -1,14 +1,14 @@
 #
 # Copyright (C) from 2009 to Present EPAM Systems.
-# 
+#
 # This file is part of Indigo toolkit.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ class BingoException(Exception):
 
     def __str__(self):
         if sys.version_info > (3, 0):
-            return repr(self.value.decode('ascii'))  
+            return repr(self.value.decode('ascii'))
         else:
             return repr(self.value)
 
@@ -126,18 +126,18 @@ class Bingo(object):
     def _checkResultString (indigo, result):
         res = Bingo._checkResultPtr(indigo, result)
         if sys.version_info >= (3, 0):
-            return res.decode('ascii')  
+            return res.decode('ascii')
         else:
             return res.encode('ascii')
 
     @staticmethod
     def _getLib(indigo):
         if os.name == 'posix' and not platform.mac_ver()[0] and not platform.system().startswith("CYGWIN"):
-            _lib = CDLL(indigo.dllpath + "/libbingo.so")
+            _lib = CDLL(indigo._dll_path + "/libbingo-nosql.so")
         elif os.name == 'nt' or platform.system().startswith("CYGWIN"):
-            _lib = CDLL(indigo.dllpath + "/bingo.dll")
+            _lib = CDLL(indigo._dll_path + "/libbingo-nosql.dll")
         elif platform.mac_ver()[0]:
-            _lib = CDLL(indigo.dllpath + "/libbingo.dylib")
+            _lib = CDLL(indigo._dll_path + "/libbingo-nosql.dylib")
         else:
             raise BingoException("unsupported OS: " + os.name)
         return _lib
@@ -258,7 +258,7 @@ class BingoObject(object):
         self._id = objId
         self._indigo = indigo
         self._bingo = bingo
-        
+
     def __del__(self):
         self.close()
 

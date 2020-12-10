@@ -57,4 +57,7 @@ api/python/indigo/lib
 *.jar
 *.nupkg
 *.whl
-
+bin
+lib
+obj
+TestResults

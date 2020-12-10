@@ -47,4 +47,5 @@ if (PREPARE_INDIGO_BINDINGS)
             COMMAND ${CMAKE_COMMAND} -E make_directory ${INDIGO_CURRENT_NATIVE_LIBS_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${INDIGO_CURRENT_NATIVE_LIBS_DIRECTORY})
     add_dependencies(before-bindings before-bindings-${PROJECT_NAME})
+    add_dependencies(before-bindings-${PROJECT_NAME} ${PROJECT_NAME})
 endif()
