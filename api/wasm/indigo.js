@@ -1,6 +1,8 @@
 const libindigo = require('./libindigo.js');
 
 // Wrap low-level C functions
+libindigo.onRuntimeInitialized = _ => {
+}
 
 _indigoGetLastError = libindigo.cwrap('indigoGetLastError', 'string', [])
 _indigoAromatize = libindigo.cwrap('indigoAromatize', 'number', ['number'])
