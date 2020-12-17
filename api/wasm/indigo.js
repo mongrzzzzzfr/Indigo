@@ -115,9 +115,8 @@ console.log('Dearomatizing...');
 m.dearomatize()
 console.log(m.smiles());
 
-let m2 = i.loadMoleculeFromString('C1C2');
-// try {
-//     letm2 = i.loadMoleculeFromString('C1C2');
-// } catch (error) {
-//     console.error("exception cathed: " + error); // TODO: Exception is being catched, but for some reason it's a number, so no error message yet
-// }
+try {
+    letm2 = i.loadMoleculeFromString('C1C2');
+} catch (error) {
+    console.error("exception cathed: " + error); // TODO: Exception is being catched, but for some reason it's a number, so no error message yet
+}

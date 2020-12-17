@@ -14,8 +14,8 @@ if (EMSCRIPTEN)
     string(APPEND CMAKE_CXX_FLAGS " -c")
     string(APPEND CMAKE_C_FLAGS   " -c")
 
-    #string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O3 -DNDEBUG -flto --llvm-opts 3")
-    #string(APPEND CMAKE_C_FLAGS_RELEASE   " -O3 -DNDEBUG -flto --llvm-opts 3")
+    string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O3 -DNDEBUG -flto --llvm-opts 3")
+    string(APPEND CMAKE_C_FLAGS_RELEASE   " -O3 -DNDEBUG -flto --llvm-opts 3")
 
     set(CMAKE_C_OUTPUT_EXTENSION ".bc")
     set(CMAKE_CXX_OUTPUT_EXTENSION ".bc")

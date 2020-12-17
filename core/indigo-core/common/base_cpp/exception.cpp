@@ -106,19 +106,19 @@ Exception::~Exception()
 {
 }
 
-
-#ifdef __EMSCRIPTEN__
-
-#include <emscripten/bind.h>
-
-std::string getExceptionMessage(int eptr)
-{
-    return reinterpret_cast<Exception*>(eptr)->message();
-}
-
-EMSCRIPTEN_BINDINGS(getExceptionMessageBinding)
-{
-    emscripten::function("getExceptionMessage", &getExceptionMessage);
-};
-
-#endif
+//
+//#ifdef __EMSCRIPTEN__
+//
+//#include <emscripten/bind.h>
+//
+//std::string getExceptionMessage(int eptr)
+//{
+//    return reinterpret_cast<Exception*>(eptr)->message();
+//}
+//
+//EMSCRIPTEN_BINDINGS(getExceptionMessageBinding)
+//{
+//    emscripten::function("getExceptionMessage", &getExceptionMessage);
+//};
+//
+//#endif
