@@ -45,7 +45,7 @@ namespace indigo
             ATOM_ABS = 4
         };
 
-        explicit MoleculeStereocenters();
+        explicit MoleculeStereocenters(BaseMolecule& baseMolecule);
 
         void clear();
 
@@ -155,6 +155,7 @@ namespace indigo
         };
 
         RedBlackMap<int, _Atom> _stereocenters;
+        BaseMolecule& _baseMolecule;
 
         static int _sign(const Vec3f& v1, const Vec3f& v2, const Vec3f& v3);
         static int _xyzzy(const Vec3f& v1, const Vec3f& v2, const Vec3f& u);
@@ -173,8 +174,6 @@ namespace indigo
         void _removeBondDir(int atom_from, int atom_to);
 
         int _getDirection(BaseMolecule& mol, int atom_from, int atom_to, bool bidirectional_mode);
-
-        BaseMolecule& _getMolecule() const;
 
     private:
         MoleculeStereocenters(const MoleculeStereocenters&); // no implicit copy

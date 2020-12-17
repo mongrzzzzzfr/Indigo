@@ -20,23 +20,30 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SOURCES})
 if (BUILD_SELF_SUFFICIENT)
-    if(CONAN_EXPORTED) # in conan local cache
-        include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-        conan_basic_setup(TARGETS)
+    if (BUILD_SELF_SUFFICIENT_CONAN)
+        if(CONAN_EXPORTED) # in conan local cache
+            include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+            conan_basic_setup(TARGETS)
+        else()
+            conan_cmake_run(REQUIRES
+                    zlib/1.2.11
+                    tinyxml/2.6.2
+                    rapidjson/cci.20200410
+                    BASIC_SETUP CMAKE_TARGETS
+                    BUILD missing)
+        endif()
+        target_link_libraries(${PROJECT_NAME}
+                PUBLIC inchi
+                PUBLIC CONAN_PKG::rapidjson
+                PUBLIC CONAN_PKG::tinyxml
+                PUBLIC CONAN_PKG::zlib)
     else()
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/inchi)
-        conan_cmake_run(REQUIRES
-                zlib/1.2.11
-                tinyxml/2.6.2
-                rapidjson/cci.20200410
-                BASIC_SETUP CMAKE_TARGETS
-                BUILD missing)
+        target_link_libraries(${PROJECT_NAME}
+                PUBLIC zlib
+                PUBLIC tinyxml
+                PUBLIC rapidjson
+                PUBLIC inchi)
     endif()
-    target_link_libraries(${PROJECT_NAME}
-            PUBLIC inchi
-            PUBLIC CONAN_PKG::rapidjson
-            PUBLIC CONAN_PKG::tinyxml
-            PUBLIC CONAN_PKG::zlib)
 else()
     find_package(InChI REQUIRED)
     find_package(TinyXML REQUIRED)

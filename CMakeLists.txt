@@ -7,11 +7,13 @@ project(indigo-all LANGUAGES C CXX)
 # Common options
 OPTION(ENABLE_TESTS "Enable CTest tests" ON)
 OPTION(BUILD_SELF_SUFFICIENT "Build without any system dependencies except for libc, otherwise require tinyxml, zlib, rapidjson, and cairo for renderer" ON)
+OPTION(BUILD_SELF_SUFFICIENT_CONAN "Use conan packages for resolving dependencies, otherwise use local version os libs" OFF)
+
 # Indigo API options
 OPTION(BUILD_INDIGO "Build indigo shared library" ON)
-OPTION(BUILD_INDIGO_INCHI "Build Indigo InChI plugin shared library" ON)
-OPTION(BUILD_INDIGO_RENDERER "Build Indigo renderer plugin shared library" ON)
-OPTION(BUILD_BINGO_NOSQL "Build Indigo bingo-nosql plugin shared library" ON)
+OPTION(BUILD_INDIGO_INCHI "Build Indigo InChI plugin shared library" OFF)
+OPTION(BUILD_INDIGO_RENDERER "Build Indigo renderer plugin shared library" OFF)
+OPTION(BUILD_BINGO_NOSQL "Build Indigo bingo-nosql plugin shared library" OFF)
 # Indigo API Bindings options
 OPTION(PREPARE_INDIGO_BINDINGS "Prepare native libraries folder for later building bindings. It could be prepared manually" OFF)
 OPTION(BUILD_INDIGO_BINDINGS "Build all existing Indigo API bindings" OFF)
@@ -78,7 +80,13 @@ message(STATUS "BUILD_UTILS=${BUILD_UTILS}")
 message(STATUS "BUILD_BINGO_POSTGRES=${BUILD_BINGO_POSTGRES}")
 message(STATUS "BUILD_BINGO_MSSQL=${BUILD_BINGO_MSSQL}")
 message(STATUS "BUILD_BINGO_ORACLE=${BUILD_BINGO_ORACLE}")
+# Show C and CXX flags
 message(STATUS "CMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
 message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
-
-find_package(R REQUIRED)
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    message(STATUS "CMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}")
+    message(STATUS "CMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}")
+elseif(CMAKE_BUILD_TYPE STREQUAL Release)
+    message(STATUS "CMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}")
+    message(STATUS "CMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}")
+endif()

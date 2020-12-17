@@ -13,25 +13,11 @@ class IndigoConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     generators = "cmake"
-    requires = ["zlib/1.2.11", "tinyxml/2.6.2", "rapidjson/cci.20200410", "cairo/1.15.14@bincrafters/stable"]
+    requires = ["zlib/1.2.11", "tinyxml/2.6.2", "rapidjson/cci.20200410"]
     default_options = {
-        "shared": True,
-        "cairo:shared": False,
-        # "cairo:with_freetype": False,
-        # "cairo:with_fontconfig": False
-        # "cairo:with_xlib": False,
-        # "cairo:with_xlib_xrender": False,
-        # "cairo:with_xcb": False,
-        # "cairo:with_glib": False,
+        "shared": True
     }
     exports_sources = [".git/*", "api/*", "cmake/*", "core/*", "CMakeLists.txt", "conanfile.txt"]
-
-    def config_options(self):
-        if self.settings.os == 'Emscripten':
-            self.options.remove('cairo:with_xlib')
-            self.options.remove('cairo:with_xlib_xrender')
-            self.options.remove('cairo:with_xcb')
-            self.options.remove('cairo:with_glib')
 
     def build(self):
         cmake = CMake(self)

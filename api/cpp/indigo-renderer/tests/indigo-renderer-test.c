@@ -58,10 +58,13 @@ int main(void)
     m = indigoLoadMoleculeFromString("COC1=CC2=C(NC(=C2)C(O)(CC2=CN=CC=C2)CC2=CN=CC=C2)C=C1");
     printf("%s\n", indigoCanonicalSmiles(m));
 
+    printf("setOption1\n");
     indigoSetOption("render-output-format", "png");
     // indigoSetOption("render-atom-ids-visible", "true");
     // indigoSetOption("render-bond-ids-visible", "true");
+    printf("setOption2\n");
     indigoSetOption("render-background-color", "255, 255, 255");
+    printf("renderToFile\n");
     indigoRenderToFile(m, "indigo-renderer-test.png");
 
     // testHDC();

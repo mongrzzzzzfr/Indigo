@@ -37,7 +37,7 @@ using namespace indigo;
 
 IMPL_ERROR(BaseMolecule, "molecule");
 
-BaseMolecule::BaseMolecule()
+BaseMolecule::BaseMolecule() : cis_trans(*this), stereocenters(*this), allene_stereo(*this)
 {
     _edit_revision = 0;
 }

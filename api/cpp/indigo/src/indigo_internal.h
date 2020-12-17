@@ -368,18 +368,24 @@ private:
     int indigo_id;
 };
 
+#include <stdio.h>
+
 #define INDIGO_BEGIN                                                                                                                                           \
     {                                                                                                                                                          \
         Indigo& self = indigoGetInstance();                                                                                                                    \
         try                                                                                                                                                    \
         {                                                                                                                                                      \
             self.error_message.clear();                                                                                                                        \
-            self.updateCancellationHandler();
+            self.updateCancellationHandler(); \
+            puts("INDIGO_BEGIN\n");
 
 #define INDIGO_END(fail)                                                                                                                                       \
+        puts("INDIGO_END_OK\n");                                                                                                                                                           \
     }                                                                                                                                                          \
     catch (Exception & ex)                                                                                                                                     \
     {                                                                                                                                                          \
+        puts("INDIGO_END_ERROR\n");                                                                                                                              \
+        puts(ex.message()); \
         self.error_message.readString(ex.message(), true);                                                                                                     \
         if (self.error_handler != 0)                                                                                                                           \
             self.error_handler(ex.message(), self.error_handler_context);                                                                                      \

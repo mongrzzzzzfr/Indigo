@@ -10,11 +10,44 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
+if (EMSCRIPTEN)
+    string(APPEND CMAKE_CXX_FLAGS " -c")
+    string(APPEND CMAKE_C_FLAGS   " -c")
+
+    #string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O3 -DNDEBUG -flto --llvm-opts 3")
+    #string(APPEND CMAKE_C_FLAGS_RELEASE   " -O3 -DNDEBUG -flto --llvm-opts 3")
+
+    set(CMAKE_C_OUTPUT_EXTENSION ".bc")
+    set(CMAKE_CXX_OUTPUT_EXTENSION ".bc")
+
+    set(CMAKE_AR "emar")
+    set(CMAKE_C_CREATE_STATIC_LIBRARY "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
+    set(CMAKE_CXX_CREATE_STATIC_LIBRARY "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
+
+    #string(APPEND CMAKE_CXX_FLAGS " -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=0")  #
+    #string(APPEND CMAKE_C_FLAGS   " -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=0")  #
+    #string(APPEND CMAKE_SHARED_LINKER_FLAGS " -s SIDE_MODULE=1 -s EXPORT_ALL=1 -s STANDALONE_WASM=1")
+    # string(APPEND CMAKE_STATIC_LINKER_FLAGS " -s SIDE_MODULE=1 -s EXPORT_ALL=1 -s STANDALONE_WASM=1")
+    #string(APPEND CMAKE_CXX_FLAGS_RELEASE " -flto")
+    #string(APPEND CMAKE_C_FLAGS_RELEASE   " -flto")
+    # set(CMAKE_SHARED_LIBRARY_SUFFIX  ".wasm")
+    # set(CMAKE_STATIC_LIBRARY_SUFFIX ".bc")
+    # set(CMAKE_AR "emcc")
+    # set(CMAKE_C_CREATE_STATIC_LIBRARY "<CMAKE_AR> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+    # set(CMAKE_CXX_CREATE_STATIC_LIBRARY "<CMAKE_AR> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+    #string(APPEND CMAKE_CXX_FLAGS_DEBUG " -s WASM=0")  # -s EMULATE_FUNCTION_POINTER_CASTS=1 -s DEMANGLE_SUPPORT=1  -O1 --source-map-base localhost:8080  -fsanitize=undefined -s ASSERTIONS=2 -s SAFE_HEAP=1 -s STACK_OVERFLOW_CHECK=2  --profiling
+    #string(APPEND CMAKE_C_FLAGS_DEBUG   " -s WASM=0")  # -s EMULATE_FUNCTION_POINTER_CASTS=1 -s DEMANGLE_SUPPORT=1 -O1  --source-map-base localhost:8080  #  -fsanitize=undefined  -s ASSERTIONS=2 -s SAFE_HEAP=1 -s STACK_OVERFLOW_CHECK=2  --profiling
+    # set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
+endif()
 if (UNIX)
     string(APPEND CMAKE_C_FLAGS " -fvisibility=hidden")
     string(APPEND CMAKE_CXX_FLAGS " -fvisibility=hidden -fvisibility-inlines-hidden")
-    if (BUILD_SELF_SUFFICIENT)
-        string(APPEND CMAKE_CXX_FLAGS " -static-libstdc++")
+    if (BUILD_SELF_SUFFICIENT AND NOT EMSCRIPTEN)
+        if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+            string(APPEND CMAKE_CXX_FLAGS " -static-libstdc++")
+        elseif  (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+            string(APPEND CMAKE_CXX_FLAGS " -Wall -Wextra -stdlib=libc++")
+        endif()
     else ()
         list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
     endif ()
@@ -28,7 +61,7 @@ if (ENABLE_TESTS)
     enable_testing()
 endif ()
 
-if (BUILD_SELF_SUFFICIENT)
+if (BUILD_SELF_SUFFICIENT AND BUILD_SELF_SUFFICIENT_CONAN)
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/conan.cmake)
 endif ()
 

@@ -542,17 +542,23 @@ DINGO_MODE indigoRenderGuessOutputFormat(const char* filename)
 
 CEXPORT int indigoRenderToFile(int object, const char* filename)
 {
+    printf("1\n");
     int f = indigoWriteFile(filename);
 
     if (f == -1)
         return -1;
 
+    printf("2\n");
     RenderParams& rp = indigoRendererGetInstance().renderParams;
+    printf("3\n");
     DINGO_MODE setMode = rp.rOpt.mode;
+    printf("4\n");
     rp.rOpt.mode = (setMode == MODE_NONE) ? indigoRenderGuessOutputFormat(filename) : setMode;
+    printf("5\n");
     int res = indigoRender(object, f);
+    printf("6\n");
     rp.rOpt.mode = setMode;
-
+    printf("7\n");
     indigoFree(f);
     return res;
 }

@@ -36,7 +36,7 @@ namespace indigo
     class DLLEXPORT MoleculeAlleneStereo
     {
     public:
-        MoleculeAlleneStereo();
+        explicit MoleculeAlleneStereo(BaseMolecule& baseMolecule);
 
         void clear();
 
@@ -84,9 +84,9 @@ namespace indigo
             int parity;
         };
 
-        BaseMolecule& _getMolecule();
         bool _isAlleneCenter(BaseMolecule& mol, int idx, _Atom& atom, int* sensible_bonds_out);
 
+        BaseMolecule& _baseMolecule;
         RedBlackMap<int, _Atom> _centers;
     };
 

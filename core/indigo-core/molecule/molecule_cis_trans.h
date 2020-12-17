@@ -42,6 +42,8 @@ namespace indigo
             TRANS = 2
         };
 
+        explicit MoleculeCisTrans(BaseMolecule& baseMolecule);
+
         void clear();
         void build(int* exclude_bonds);
         void buildFromSmiles(int* dirs);
@@ -97,8 +99,6 @@ namespace indigo
         bool sameside(int edge_idx, int v1, int v2);
 
     protected:
-        BaseMolecule& _getMolecule();
-
         struct _Bond
         {
             void clear()
@@ -113,6 +113,7 @@ namespace indigo
         };
 
         Array<_Bond> _bonds;
+        BaseMolecule& _baseMolecule;
 
         static bool _pureH(BaseMolecule& mol, int idx);
         static int _sameside(BaseMolecule& mol, int i_beg, int i_end, int i_nei_beg, int i_nei_end);

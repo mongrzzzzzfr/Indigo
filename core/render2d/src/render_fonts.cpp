@@ -116,6 +116,7 @@ void RenderContext::fontsGetTextExtents(cairo_t* cr, const char* text, int size,
 {
     cairo_text_extents_t te;
     _tlock.lock();
+    printf("%s\n", text);
     cairo_text_extents(cr, text, &te);
     _tlock.unlock();
     cairoCheckStatus();

@@ -10,22 +10,7 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC indigo-core)
 
 if (BUILD_SELF_SUFFICIENT)
-    if(CONAN_EXPORTED)
-        include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-        conan_basic_setup(TARGETS)
-    else()
-        conan_cmake_run(REQUIRES
-                cairo/1.17.2
-                OPTIONS
-                    cairo:shared=False
-                    cairo:with_xlib=False
-                    cairo:with_xlib_xrender=False
-                    cairo:with_xcb=False
-                    cairo:with_glib=False
-                BASIC_SETUP CMAKE_TARGETS
-                BUILD missing)
-    endif()
-    target_link_libraries(${PROJECT_NAME} PUBLIC CONAN_PKG::cairo)
+    target_link_libraries(${PROJECT_NAME} PUBLIC cairo)
 else()
     find_package(Cairo REQUIRED)
     target_link_libraries(${PROJECT_NAME}
