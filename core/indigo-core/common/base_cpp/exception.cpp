@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "base_c/defs.h"
 #include "base_cpp/exception.h"
 
 using namespace indigo;
@@ -48,12 +47,17 @@ Exception::Exception(const Exception& other)
     strncpy(_message, other._message, sizeof(_message));
 }
 
-const char* Exception::message()
+const char* Exception::message() const noexcept
 {
     return _message;
 }
 
-int Exception::code()
+const char* Exception::what() const noexcept
+{
+    return _message;
+}
+
+int Exception::code() const noexcept
 {
     return _code;
 }
@@ -101,24 +105,3 @@ void Exception::throwSelf()
 {
     throw *this;
 }
-
-Exception::~Exception()
-{
-}
-
-//
-//#ifdef __EMSCRIPTEN__
-//
-//#include <emscripten/bind.h>
-//
-//std::string getExceptionMessage(int eptr)
-//{
-//    return reinterpret_cast<Exception*>(eptr)->message();
-//}
-//
-//EMSCRIPTEN_BINDINGS(getExceptionMessageBinding)
-//{
-//    emscripten::function("getExceptionMessage", &getExceptionMessage);
-//};
-//
-//#endif

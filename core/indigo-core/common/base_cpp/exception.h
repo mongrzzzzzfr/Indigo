@@ -21,20 +21,22 @@
 
 #include <cstdarg>
 #include <cstring>
+#include <stdexcept>
 
 #include "base_c/defs.h"
 
 namespace indigo
 {
 
-    class DLLEXPORT Exception
+    class DLLEXPORT Exception : public std::exception
     {
     public:
         explicit Exception(const char* format, ...);
-        virtual ~Exception();
 
-        int code();
-        const char* message();
+        int code() const noexcept;
+        const char* message() const noexcept;
+        const char* what() const noexcept override;
+
         void appendMessage(const char* format, ...);
 
         virtual Exception* clone();
@@ -52,8 +54,6 @@ namespace indigo
 
         int _code;
         char _message[1024];
-
-    private:
     };
 
 #define DECL_EXCEPTION_BODY(ExceptionName, Parent)                                                                                                             \

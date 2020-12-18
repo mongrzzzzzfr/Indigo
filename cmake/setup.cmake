@@ -11,17 +11,14 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 if (EMSCRIPTEN)
-    string(APPEND CMAKE_CXX_FLAGS " -c")
-    string(APPEND CMAKE_C_FLAGS   " -c")
+    string(APPEND CMAKE_CXX_FLAGS " -c -fexceptions --bind -s DISABLE_EXCEPTION_CATCHING=0 -s FILESYSTEM=0 -s USE_SDL=0 -s USE_SDL_IMAGE=0 -s USE_SDL_TTF=0 -s USE_SDL_NET=0")
+    string(APPEND CMAKE_C_FLAGS   " -c -fexceptions --bind -s DISABLE_EXCEPTION_CATCHING=0 -s FILESYSTEM=0 -s USE_SDL=0 -s USE_SDL_IMAGE=0 -s USE_SDL_TTF=0 -s USE_SDL_NET=0")
 
     set(CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG -flto")
     set(CMAKE_C_FLAGS_RELEASE   "-Oz -DNDEBUG -flto")
 
     set(CMAKE_CXX_FLAGS_DEBUG "-g -Oz -flto")
     set(CMAKE_C_FLAGS_DEBUG   "-g -Oz -flto")
-
-    set(CMAKE_C_OUTPUT_EXTENSION   ".bc")
-    set(CMAKE_CXX_OUTPUT_EXTENSION ".bc")
 
     set(CMAKE_AR "emar")
     set(CMAKE_C_CREATE_STATIC_LIBRARY   "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")

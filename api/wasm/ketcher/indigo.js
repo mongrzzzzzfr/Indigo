@@ -1,18 +1,10 @@
-const libindigo = require('./libindigo.js');
-
-// Wrap low-level C functions
-libindigo.onRuntimeInitialized = _ => {
-}
-
-_indigoGetLastError = libindigo.cwrap('indigoGetLastError', 'string', [])
-_indigoAromatize = libindigo.cwrap('indigoAromatize', 'number', ['number'])
-_indigoDearomatize = libindigo.cwrap('indigoDearomatize', 'number', ['number'])
-_indigoVersion = libindigo.cwrap('indigoVersion', 'string', [])
-_indigoLoadMoleculeFromString = libindigo.cwrap('indigoLoadMoleculeFromString', 'number', ['string'])
-_indigoMolfile = libindigo.cwrap('indigoMolfile', 'string', ['number'])
-_indigoSmiles = libindigo.cwrap('indigoSmiles', 'string', ['number'])
-
-// High level wrappers
+let _indigoGetLastError,
+	_indigoAromatize,
+	_indigoDearomatize,
+	_indigoVersion,
+	_indigoLoadMoleculeFromString,
+	_indigoMolfile,
+	_indigoSmiles
 
 class IndigoException {
     constructor(message) {
@@ -106,19 +98,32 @@ class Indigo {
     }
 }
 
-// Some simple tests
+const moduleFn = require('./libindigo.js')
 
-let i = new Indigo();
-let m = i.loadMolecule("C1=CC=CC=C1");
-console.log('Aromatizing...');
-m.aromatize();
-console.log(m.smiles());
-console.log('Dearomatizing...');
-m.dearomatize()
-console.log(m.smiles());
+const promise = moduleFn({option1: 'test'})
+promise.then(libindigo => {
+    console.log(Object.keys(libindigo));
+	_indigoGetLastError = libindigo.cwrap('indigoGetLastError', 'string', [])
+	_indigoAromatize = libindigo.cwrap('indigoAromatize', 'number', ['number'])
+	_indigoDearomatize = libindigo.cwrap('indigoDearomatize', 'number', ['number'])
+	_indigoVersion = libindigo.cwrap('indigoVersion', 'string', [])
+	_indigoLoadMoleculeFromString = libindigo.cwrap('indigoLoadMoleculeFromString', 'number', ['string'])
+	_indigoMolfile = libindigo.cwrap('indigoMolfile', 'string', ['number'])
+	_indigoSmiles = libindigo.cwrap('indigoSmiles', 'string', ['number'])
 
-try {
-    letm2 = i.loadMoleculeFromString('C1C2');
-} catch (error) {
-    console.error("exception cathed: " + error); // TODO: Exception is being catched, but for some reason it's a number, so no error message yet
-}
+	//test
+	let i = new Indigo();
+	let m = i.loadMolecule("C1=CC=CC=C1");
+	console.log('Aromatizing...');
+	m.aromatize();
+	console.log(m.smiles());
+	console.log('Dearomatizing...');
+	m.dearomatize()
+	console.log(m.smiles());
+	// attempt to load incorrect molecule
+    try {
+        let m2 = i.loadMolecule('C1C2');
+    } catch (e) {
+        console.log(e);
+    }
+})

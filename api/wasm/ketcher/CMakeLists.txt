@@ -12,11 +12,14 @@ message(STATUS "INDIGO_EMSCRIPTEN_FLAGS=${INDIGO_EMSCRIPTEN_FLAGS}")
 add_custom_target(${PROJECT_NAME}
                   COMMAND emcc
                     # -Oz -flto -DNDEBUG  # --closure 1
-                    -Oz -g -flto # --closure 1
+                    -Oz -flto --closure 1
+                    --bind
                     -s INITIAL_MEMORY=16777216
                     -s EXPORTED_RUNTIME_METHODS=['cwrap']
                     -s DISABLE_EXCEPTION_THROWING=0
                     -s DISABLE_EXCEPTION_CATCHING=0
+                    -s SINGLE_FILE=1
+                    -s MODULARIZE=1
                     -s FILESYSTEM=0
                     -s USE_SDL=0 -s USE_SDL_IMAGE=0 -s USE_SDL_TTF=0 -s USE_SDL_NET=0
                     -s EXPORTED_FUNCTIONS=['_indigoAromatize','_indigoDearomatize','_indigoVersion','_indigoLoadMoleculeFromString','_indigoMolfile','_indigoSmiles','_indigoGetLastError']
