@@ -11,7 +11,7 @@ OPTION(BUILD_SELF_SUFFICIENT_CONAN "Use conan packages for resolving dependencie
 
 # Indigo API options
 OPTION(BUILD_INDIGO "Build indigo shared library" ON)
-OPTION(BUILD_INDIGO_INCHI "Build Indigo InChI plugin shared library" OFF)
+OPTION(BUILD_INDIGO_INCHI "Build Indigo InChI plugin shared library" ON)
 OPTION(BUILD_INDIGO_RENDERER "Build Indigo renderer plugin shared library" OFF)
 OPTION(BUILD_BINGO_NOSQL "Build Indigo bingo-nosql plugin shared library" OFF)
 # Indigo API Bindings options

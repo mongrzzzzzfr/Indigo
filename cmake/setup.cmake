@@ -20,6 +20,7 @@ if (EMSCRIPTEN)
     set(CMAKE_CXX_FLAGS_DEBUG "-g -Oz -flto")
     set(CMAKE_C_FLAGS_DEBUG   "-g -Oz -flto")
 
+
     set(CMAKE_AR "emar")
     set(CMAKE_C_CREATE_STATIC_LIBRARY   "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
     set(CMAKE_CXX_CREATE_STATIC_LIBRARY "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
