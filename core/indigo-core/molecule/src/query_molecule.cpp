@@ -1612,7 +1612,7 @@ bool QueryMolecule::aromatize(const AromaticityOptions& options)
 
 bool QueryMolecule::dearomatize(const AromaticityOptions& options)
 {
-    throw Error("Dearomatization not implemented");
+    throw Error("Dearomatization of query molecules is not implemented");
 }
 
 int QueryMolecule::getAtomMaxH(int idx)

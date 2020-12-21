@@ -15,8 +15,8 @@ set(EMCC_FLAGS
     -s MODULARIZE=1
     -s FILESYSTEM=0
     -s USE_SDL=0 -s USE_SDL_IMAGE=0 -s USE_SDL_TTF=0 -s USE_SDL_NET=0
-    -s DEMANGLE_SUPPORT=1
-    -s EXPORT_ALL=1
+    # -s DEMANGLE_SUPPORT=1
+    # -s EXPORT_ALL=1
     --no-entry)
 #if (CMAKE_BUILD_TYPE STREQUAL Release)
 #    list(APPEND EMCC_FLAGS

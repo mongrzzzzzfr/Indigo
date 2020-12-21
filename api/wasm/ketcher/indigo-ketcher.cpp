@@ -6,11 +6,13 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
+#define RAPIDJSON_HAS_STDSTRING 1
+
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 
-#include "indigo-inchi.h"
 #include "indigo.h"
+#include "indigo-inchi.h"
 
 namespace indigo
 {
@@ -40,7 +42,7 @@ namespace indigo
 
     cstring _checkResultString(cstring result)
     {
-        if (!result)
+        if (result == nullptr)
         {
             jsThrow(indigoGetLastError());
         }
@@ -82,6 +84,7 @@ namespace indigo
     IndigoKetcherObject loadMoleculeOrReaction(cstring data)
     {
         std::vector<std::string> exceptionMessages;
+        exceptionMessages.reserve(4);
         // Let's try a simple molecule
         int objectId = indigoLoadMoleculeFromString(data);
         if (objectId >= 0)
@@ -125,7 +128,7 @@ namespace indigo
 
     std::string version()
     {
-        return indigoVersion();
+        return _checkResultString(indigoVersion());
     }
 
     std::string convert(const std::string& data, const std::string& outputFormat, const std::map<std::string, std::string>& options)
@@ -136,38 +139,38 @@ namespace indigo
         {
             if (iko.isReaction)
             {
-                return indigoRxnfile(iko.id);
+                return _checkResultString(indigoRxnfile(iko.id));
             }
-            return indigoMolfile(iko.id);
+            return _checkResultString(indigoMolfile(iko.id));
             }
         if (outputFormat == "smiles" or outputFormat == "chemical/x-daylight-smiles" || outputFormat == "chemical/x-chemaxon-cxsmiles")
         {
             if (options.count("smiles") && options.at("smiles") == "canonical")
             {
-                return indigoCanonicalSmiles(iko.id);
+                return _checkResultString(indigoCanonicalSmiles(iko.id));
             }
-            return indigoCanonicalSmiles(iko.id);
+            return _checkResultString(indigoSmiles(iko.id));
             }
         if (outputFormat == "smarts" || outputFormat == "chemical/x-daylight-smarts")
         {
             if (options.count("smarts") && options.at("smarts") == "canonical")
             {
-                return indigoCanonicalSmarts(iko.id);
+                return _checkResultString(indigoCanonicalSmarts(iko.id));
             }
-            return indigoSmarts(iko.id);
+            return _checkResultString(indigoSmarts(iko.id));
             }
         if (outputFormat == "cml" || outputFormat == "chemical/x-cml")
         {
-            return indigoCml(iko.id);
+            return _checkResultString(indigoCml(iko.id));
         }
         if (outputFormat == "inchi" || outputFormat == "chemical/x-inchi")
         {
-            return indigoInchiGetInchi(iko.id);
+            return _checkResultString(indigoInchiGetInchi(iko.id));
         }
         if (outputFormat == "inchi-aux" || outputFormat == "chemical/x-inchi-aux")
         {
             std::stringstream ss;
-            ss << indigoInchiGetInchi(iko.id) << '\n' << indigoInchiGetAuxInfo();
+            ss << _checkResultString(indigoInchiGetInchi(iko.id)) << '\n' << _checkResultString(indigoInchiGetAuxInfo());
             return ss.str();
         }
         std::stringstream ss;
@@ -222,35 +225,38 @@ namespace indigo
         return _checkResultString(indigoCheck(iko.id, properties.c_str()));
     }
 
-    std::string calculate(const std::string& data, const std::map<std::string, std::string>& options)
-    {
-        indigoSetOptions(options);
-        indigoSetOption("molfile-saving-add-stereo-desc", "true");
-        const auto iko = loadMoleculeOrReaction(data.c_str());
-        rapidjson::Document result;
-        result["molecular-weight"] = _checkResultFloat(indigoMolecularWeight(iko.id));
-        result["most-abundant-mass"] = _checkResultFloat(indigoMostAbundantMass(iko.id));
-        result["monoisotopic-mass"] = _checkResultFloat(indigoMonoisotopicMass(iko.id));
-        {
-            const std::string massComposition =_checkResultString(indigoMassComposition(iko.id));
-            result["mass-composition"].SetString(massComposition.c_str(), massComposition.size());
-        }
-        {
-            const std::string grossFormula = _checkResultString(indigoToString(_checkResult(indigoGrossFormula(iko.id))));
-            result["gross"].SetString(grossFormula.c_str(), grossFormula.size());
-        }
-        rapidjson::StringBuffer buffer;
-        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-        result.Accept(writer);
-        return buffer.GetString();
-    }
-
     std::string calculateCip(const std::string& data, const std::map<std::string, std::string>& options)
     {
         indigoSetOptions(options);
         indigoSetOption("molfile-saving-add-stereo-desc", "true");
         const auto iko = loadMoleculeOrReaction(data.c_str());
         return iko.toString();
+    }
+
+    std::string calculate(const std::string& data, const std::map<std::string, std::string>& options)
+    {
+        indigoSetOptions(options);
+        indigoSetOption("molfile-saving-add-stereo-desc", "true");
+        const auto iko = loadMoleculeOrReaction(data.c_str());
+        rapidjson::Document result;
+        auto & allocator = result.GetAllocator();
+        result.SetObject();
+        result.AddMember("molecular-weight", _checkResultFloat(indigoMolecularWeight(iko.id)), allocator);
+        result.AddMember("most-abundant-mass", _checkResultFloat(indigoMostAbundantMass(iko.id)), allocator);
+        result.AddMember("monoisotopic-mass", _checkResultFloat(indigoMonoisotopicMass(iko.id)), allocator);
+        {
+            const std::string massComposition = _checkResultString(indigoMassComposition(iko.id));
+            result.AddMember("mass-composition", massComposition, allocator);
+        }
+        {
+            const std::string grossFormula = _checkResultString(indigoToString(_checkResult(indigoGrossFormula(iko.id))));
+            result.AddMember("gross-formula", grossFormula, allocator);
+        }
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        writer.SetMaxDecimalPlaces(3);
+        result.Accept(writer);
+        return buffer.GetString();
     }
 
 #ifdef __EMSCRIPTEN__
@@ -265,10 +271,9 @@ namespace indigo
         emscripten::function("clean2d", &clean2d);
         emscripten::function("automap", &automap);
         emscripten::function("check", &check);
-        // TODO: Check calculate // emscripten::function("calculate", &calculate);
         emscripten::function("calculateCip", &calculateCip);
+        emscripten::function("calculate", &calculate);
 
-        // register_map<std::string, std::string>("map<string, string>");
         emscripten::register_map<std::string, std::string>("map<string, string>");
     }
 
