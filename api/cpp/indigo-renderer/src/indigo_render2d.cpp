@@ -368,56 +368,59 @@ void indigoRenderGetCdxmlPropertiesKeyAlignment(Array<char>& value)
         value.readString("right", true);
 }
 
-CEXPORT int indigoRender(int object, int output){INDIGO_BEGIN{RenderParams& rp = indigoRendererGetInstance().renderParams;
-// If there are molecules/reactions in the arrays then current call will
-// rendere a grid -> needs to clear it
-rp.clearArrays();
-rp.smart_layout = self.smart_layout;
+CEXPORT int indigoRender(int object, int output){
+    INDIGO_BEGIN
+    {
+        RenderParams& rp = indigoRendererGetInstance().renderParams;
+        // If there are molecules/reactions in the arrays then current call will
+        // rendere a grid -> needs to clear it
+        rp.clearArrays();
+        rp.smart_layout = self.smart_layout;
 
-IndigoObject& obj = self.getObject(object);
+        IndigoObject& obj = self.getObject(object);
 
-if (IndigoBaseMolecule::is(obj))
-{
-    if (obj.getBaseMolecule().isQueryMolecule())
-        rp.mol.reset(new QueryMolecule());
-    else
-        rp.mol.reset(new Molecule());
-    rp.mol->clone_KeepIndices(self.getObject(object).getBaseMolecule());
-    rp.rmode = RENDER_MOL;
-}
-else if (IndigoBaseReaction::is(obj))
-{
-    if (obj.getBaseReaction().isQueryReaction())
-        rp.rxn.reset(new QueryReaction());
-    else
-        rp.rxn.reset(new Reaction());
-    rp.rxn->clone(self.getObject(object).getBaseReaction(), 0, 0, 0);
-    rp.rmode = RENDER_RXN;
-}
-else
-{
-    throw IndigoError("The object provided should be a molecule, a reaction or an array of such");
-}
+        if (IndigoBaseMolecule::is(obj))
+        {
+            if (obj.getBaseMolecule().isQueryMolecule())
+                rp.mol.reset(new QueryMolecule());
+            else
+                rp.mol.reset(new Molecule());
+            rp.mol->clone_KeepIndices(self.getObject(object).getBaseMolecule());
+            rp.rmode = RENDER_MOL;
+        }
+        else if (IndigoBaseReaction::is(obj))
+        {
+            if (obj.getBaseReaction().isQueryReaction())
+                rp.rxn.reset(new QueryReaction());
+            else
+                rp.rxn.reset(new Reaction());
+            rp.rxn->clone(self.getObject(object).getBaseReaction(), 0, 0, 0);
+            rp.rmode = RENDER_RXN;
+        }
+        else
+        {
+            throw IndigoError("The object provided should be a molecule, a reaction or an array of such");
+        }
 
-IndigoObject& out = self.getObject(output);
-if (out.type == IndigoHDCOutput::HDC_OUTPUT)
-{
-    IndigoHDCOutput& hdcOut = (IndigoHDCOutput&)self.getObject(output);
-    rp.rOpt.hdc = hdcOut.dc;
-    rp.rOpt.mode = hdcOut.prn ? MODE_PRN : MODE_HDC;
-}
-else if (out.type == IndigoObject::OUTPUT)
-{
-    rp.rOpt.output = &IndigoOutput::get(out);
-}
-else
-{
-    throw IndigoError("Invalid output object type");
-}
-RenderParamInterface::render(rp);
-return 1;
-}
-INDIGO_END(-1)
+        IndigoObject& out = self.getObject(output);
+        if (out.type == IndigoHDCOutput::HDC_OUTPUT)
+        {
+            IndigoHDCOutput& hdcOut = (IndigoHDCOutput&)self.getObject(output);
+            rp.rOpt.hdc = hdcOut.dc;
+            rp.rOpt.mode = hdcOut.prn ? MODE_PRN : MODE_HDC;
+        }
+        else if (out.type == IndigoObject::OUTPUT)
+        {
+            rp.rOpt.output = &IndigoOutput::get(out);
+        }
+        else
+        {
+            throw IndigoError("Invalid output object type");
+        }
+        RenderParamInterface::render(rp);
+        return 1;
+    }
+    INDIGO_END(-1)
 }
 
 CEXPORT int indigoRenderGrid(int objects, int* refAtoms, int nColumns, int output){INDIGO_BEGIN{RenderParams& rp = indigoRendererGetInstance().renderParams;

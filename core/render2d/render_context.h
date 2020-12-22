@@ -19,7 +19,7 @@
 #ifndef __render_context_h__
 #define __render_context_h__
 
-#include <cairo-pdf.h>
+// #include <cairo-pdf.h>
 #include <cairo-svg.h>
 #include <cairo.h>
 

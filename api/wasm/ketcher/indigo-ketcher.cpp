@@ -13,6 +13,7 @@
 
 #include "indigo.h"
 #include "indigo-inchi.h"
+#include "indigo-renderer.h"
 
 namespace indigo
 {
@@ -236,7 +237,6 @@ namespace indigo
     std::string calculate(const std::string& data, const std::map<std::string, std::string>& options)
     {
         indigoSetOptions(options);
-        indigoSetOption("molfile-saving-add-stereo-desc", "true");
         const auto iko = loadMoleculeOrReaction(data.c_str());
         rapidjson::Document result;
         auto & allocator = result.GetAllocator();
@@ -259,6 +259,20 @@ namespace indigo
         return buffer.GetString();
     }
 
+    std::string render(const std::string& data, const std::map<std::string, std::string>& options)
+    {
+        indigoSetOption("render-output-format", "svg");
+        indigoSetOptions(options);
+        const auto iko = loadMoleculeOrReaction(data.c_str());
+        auto buffer_object = _checkResult(indigoWriteBuffer());
+        char* raw_ptr;
+        int size;
+        _checkResult(indigoRender(iko.id, buffer_object));
+        _checkResult(indigoToBuffer(buffer_object, &raw_ptr, &size));
+        indigoFree(buffer_object);
+        return std::string(raw_ptr, size);
+    }
+
 #ifdef __EMSCRIPTEN__
 
     EMSCRIPTEN_BINDINGS(module)
@@ -273,6 +287,7 @@ namespace indigo
         emscripten::function("check", &check);
         emscripten::function("calculateCip", &calculateCip);
         emscripten::function("calculate", &calculate);
+        emscripten::function("render", &render);
 
         emscripten::register_map<std::string, std::string>("map<string, string>");
     }

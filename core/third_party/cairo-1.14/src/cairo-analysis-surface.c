@@ -448,7 +448,7 @@ _cairo_analysis_surface_mask (void			*abstract_surface,
 }
 
 static cairo_int_status_t
-_cairo_analysis_surface_stroke (void			*abstract_surface,
+_cairo_analysis_surface_stroke (cairo_surface_t			*abstract_surface,
 				cairo_operator_t	 op,
 				const cairo_pattern_t	*source,
 				const cairo_path_fixed_t	*path,
@@ -460,7 +460,7 @@ _cairo_analysis_surface_stroke (void			*abstract_surface,
 				const cairo_clip_t		*clip)
 {
     printf("1\n");
-    cairo_analysis_surface_t *surface = abstract_surface;
+    cairo_analysis_surface_t *surface = (cairo_analysis_surface_t*) abstract_surface;
     cairo_int_status_t	     backend_status;
     cairo_rectangle_int_t    extents;
     printf("2\n");

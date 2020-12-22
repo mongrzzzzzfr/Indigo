@@ -2468,7 +2468,7 @@ _cairo_svg_surface_stroke (void			*abstract_dst,
 			   cairo_antialias_t	 antialias,
 			   const cairo_clip_t	*clip)
 {
-    cairo_svg_surface_t *surface = abstract_dst;
+    cairo_svg_surface_t *surface = (cairo_svg_surface_t*) abstract_dst;
     cairo_status_t status;
 
     if (surface->paginated_mode == CAIRO_PAGINATED_MODE_ANALYZE)

@@ -54,11 +54,13 @@ void RenderContext::fontsClear()
     cairoCheckStatus();
 }
 
+#include <stdio.h>
+
 void RenderContext::fontsInit()
 {
-    // printf("setfontfamily_begin\n");
+    printf("setfontfamily_begin\n");
     fontOptions = cairo_font_options_create();
-    // printf("setfontfamily_end\n");
+    printf("setfontfamily_end\n");
     cairoCheckStatus();
     cairo_font_options_set_antialias(fontOptions, CAIRO_ANTIALIAS_GRAY);
     cairoCheckStatus();

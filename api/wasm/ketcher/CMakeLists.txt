@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.6)
 project(indigo-ketcher)
 
 add_library(${PROJECT_NAME} indigo-ketcher.cpp)
-target_link_libraries(${PROJECT_NAME} indigo-static indigo-inchi-static)
+target_link_libraries(${PROJECT_NAME} indigo-static indigo-inchi-static indigo-renderer-static)
 
 set(EMCC_FLAGS
-    -Oz -flto --closure 1
+     -Oz -flto --closure 1 # -g4 #
     --bind
     -s INITIAL_MEMORY=16777216
     -s DISABLE_EXCEPTION_THROWING=0
@@ -14,9 +14,10 @@ set(EMCC_FLAGS
     -s SINGLE_FILE=1
     -s MODULARIZE=1
     -s FILESYSTEM=0
+    -s ASSERTIONS=1
+    # -s EMULATE_FUNCTION_POINTER_CASTS=1
+    -s DEMANGLE_SUPPORT=1
     -s USE_SDL=0 -s USE_SDL_IMAGE=0 -s USE_SDL_TTF=0 -s USE_SDL_NET=0
-    # -s DEMANGLE_SUPPORT=1
-    # -s EXPORT_ALL=1
     --no-entry)
 #if (CMAKE_BUILD_TYPE STREQUAL Release)
 #    list(APPEND EMCC_FLAGS
@@ -27,12 +28,13 @@ set(EMCC_FLAGS
 #    list(APPEND EMCC_FLAGS
 #            -g3)
 #endif()
+# -s DEMANGLE_SUPPORT=1
+# -s EXPORT_ALL=1
 
 add_custom_target(${PROJECT_NAME}-js
         COMMAND emcc
             -o ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libindigo-ketcher.js
             ${EMCC_FLAGS}
             -Wl,--whole-archive $<TARGET_FILE:indigo-ketcher> -Wl,--no-whole-archive
-            $<TARGET_FILE:indigo-static> $<TARGET_FILE:indigo-inchi-static> $<TARGET_FILE:indigo-core> $<TARGET_FILE:inchi> $<TARGET_FILE:tinyxml> $<TARGET_FILE:zlib>
+            $<TARGET_FILE:indigo-static> $<TARGET_FILE:indigo-inchi-static> $<TARGET_FILE:indigo-renderer-static> $<TARGET_FILE:render2d> $<TARGET_FILE:cairo> $<TARGET_FILE:png> $<TARGET_FILE:pixman> $<TARGET_FILE:indigo-core> $<TARGET_FILE:inchi> $<TARGET_FILE:tinyxml> $<TARGET_FILE:zlib>
 )
-

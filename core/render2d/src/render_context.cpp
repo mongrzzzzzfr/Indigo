@@ -219,10 +219,10 @@ void RenderContext::createSurface(cairo_write_func_t writer, Output* output, int
     {
     case MODE_NONE:
         throw Error("mode not set");
-    case MODE_PDF:
-        _surface = cairo_pdf_surface_create_for_stream(writer, opt.output, _width, _height);
-        cairoCheckSurfaceStatus();
-        break;
+//    case MODE_PDF:
+//        _surface = cairo_pdf_surface_create_for_stream(writer, opt.output, _width, _height);
+//        cairoCheckSurfaceStatus();
+//        break;
     case MODE_SVG:
         _surface = cairo_svg_surface_create_for_stream(writer, opt.output, _width, _height);
         cairoCheckSurfaceStatus();
